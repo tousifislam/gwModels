@@ -95,11 +95,12 @@ def phase_align_dict(hdict):
     """
     align waveform dict to have proper phases
     """
+    hdict_out = {}
     phi=np.unwrap(np.angle(hdict['h_l2m2']))
     # Added to enforce correct relative phasing of higher modes (see "else" block)
     z_rot = phi[0]/2.0
     phi=phi-phi[0]
-    hdict['h_l2m2']=abs(hdict['h_l2m2'])*np.exp(1j*phi)
+    hdict_out['h_l2m2']=abs(hdict['h_l2m2'])*np.exp(1j*phi)
 
     for mode in hdict.keys():
         if mode=='h_l2m2':
@@ -108,8 +109,8 @@ def phase_align_dict(hdict):
             phi=np.unwrap(np.angle(hdict[mode]))
             m = float(mode.rsplit("m")[1])
             # modified to enforce correct relative phasing
-            hdict[mode]=abs(hdict[mode])*np.exp(1j*(phi-z_rot*m)) # phase -> phase + z_rot*m
-    return hdict
+            hdict_out[mode]=abs(hdict[mode])*np.exp(1j*(phi-z_rot*m)) # phase -> phase + z_rot*m
+    return hdict_out
 
 class AlignWFData:
     """

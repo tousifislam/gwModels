@@ -1,3 +1,14 @@
+#! /usr/bin/env python
+#-*- coding: utf-8 -*-
+#==============================================================================
+#
+#     FILE: eccentricIMR.py
+#
+#        AUTHOR: Tousif Islam
+#       CREATED: 07-02-2024
+# LAST MODIFIED: Tue Feb  7 17:58:52 2024
+#      REVISION: ---
+#==============================================================================
 """
 Code to generate eccentric BBH merger waveform using a PN+NR IMR model built by Hinder et al.
 This is a python wrapper to work efficiently with the original Mathematica code

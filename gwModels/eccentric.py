@@ -24,7 +24,7 @@ class NRHME:
     if the quadrupolar eccentric waveform is known
     """
     def __init__(self, t_ecc=None, h_ecc_dict=None, t_cir=None, h_cir_dict=None, 
-                 get_orbfreq_mod_from_amp_mod=False):
+                 get_orbfreq_mod_from_amp_mod=False, recompute_tpeak=True):
         """
         t_ecc: time array for the eccentric 22 mode waveform
         h_ecc_dict: dictionary of eccentric wavefform modes. Should only contain 22 mode
@@ -61,8 +61,12 @@ class NRHME:
         # should we compute orbital frequency modulation separately
         self.get_orbfreq_mod_from_amp_mod = get_orbfreq_mod_from_amp_mod
         
+        # should we recompute where the peaks are
+        self.recompute_tpeak = recompute_tpeak
+        
         # align peaks
-        self.align_peaks()
+        if self.recompute_tpeak:
+            self.align_peaks()
         
         # cast on common time grid
         self.t_common = self.obtain_common_timegrid()
@@ -94,10 +98,10 @@ class NRHME:
         construct a common time-grid between the circular waveform and the eccentric
         22 mode waveform
         """
-        tmin = max(min(self.t_cir),min(self.t_ecc),-2750) + 50
-        t_buffer = 10
+        t_buffer = 100
         end_time = 100
-        tmax = min(max(self.t_cir)-t_buffer,max(self.t_ecc)-t_buffer,end_time) 
+        tmin = max(min(self.t_cir),min(self.t_ecc)) + t_buffer
+        tmax = min(max(self.t_cir),max(self.t_ecc),end_time)
         tcommon = np.arange(tmin,tmax,0.1)
         return tcommon
     
