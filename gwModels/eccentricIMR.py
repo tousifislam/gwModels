@@ -2,11 +2,11 @@
 #-*- coding: utf-8 -*-
 #==============================================================================
 #
-#     FILE: eccentricIMR.py
+#    FILE: eccentric.py
 #
 #        AUTHOR: Tousif Islam
-#       CREATED: 07-02-2024
-# LAST MODIFIED: Tue Feb  7 17:58:52 2024
+#       CREATED: 07-03-2024
+# LAST MODIFIED: Tue Feb  6 17:58:52 2024
 #      REVISION: ---
 #==============================================================================
 """
