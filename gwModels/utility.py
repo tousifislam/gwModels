@@ -51,22 +51,17 @@ def check_pi_rotation(h_dict):
     Checks whether a pi rotation is required in waveform mode data
     h_dict: dictionary of gravitational waves modes. Keys should be "h_l2m2" and so on
     """
+    phi = gwtools.phase(h_dict['h_l2m1'])
+    # decide whether to perform a physical \pi rotation
+    if phi[0]>0:
+        pi_rot_factor=-1
+    else:
+        pi_rot_factor=1
+        
     for mode in h_dict.keys():
         # do nothing for the 22 mode
         if mode == 'h_l2m2':
             pass
-        # check whether you need to perform a pi rotation based on the phase 
-        # of the 21 mode
-        elif mode == 'h_l2m1':
-            phi = gwtools.phase(h_dict['h_l2m1'])
-            # decide whether to perform a physical \pi rotation
-            if phi[0]>0:
-                pi_rot_factor=-1
-            else:
-                pi_rot_factor=1
-            m = 1
-            # rotate 21 mode
-            h_dict['h_l2m1'] = ((pi_rot_factor)**m) * h_dict['h_l2m1']
         # for other modes, rotate odd m modes only
         else:
             m = float(mode.rsplit("m")[1])

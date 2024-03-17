@@ -51,7 +51,8 @@ class NRHME:
             raise ValueError("h_cir_dict must be given as input")
             
         self.modelist = list(h_cir_dict.keys())
-        if self.modelist[0] in ['h_l2m0', 'h_l2m1','h_l2m2','h_l3m0','h_l3m1','h_l3m2','h_l3m3','h_l4m0','h_l4m1','h_4m2', 'h_l4m3', 'h_l4m4']:
+        if self.modelist[0] in ['h_l2m0', 'h_l2m1','h_l2m2','h_l3m0','h_l3m1','h_l3m2','h_l3m3','h_l4m0','h_l4m1','h_4m2', 'h_l4m3', 'h_l4m4',
+                               'h_l2m-1','h_l2m-2','h_l3m-1','h_l3m-2','h_l3m-3','h_l4m-1','h_4m-2', 'h_l4m-3', 'h_l4m-4', 'h_l5m5', 'h_l5m-5']:
             self.modekeytype = 'h_llmm'
         elif self.modelist[0] in [(2,0),(2,1),(2,2),(3,0),(3,1),(3,2),(3,3),(4,0),(4,1),(4,2),(4,3),(4,4)]:
             self.modekeytype = '(l,m)'
