@@ -12,11 +12,14 @@ git clone https://github.com/tousifislam/gwModels
 
 ## Available Models
 
-#### 1. EccentricIMR 
+#### 1. gwNRHME
+A framework to seamlessly convert a multi-modal (i.e with several spherical harmonic modes) quasi-circular waveform into multi-modal eccentric waveform if the quadrupolar eccentric waveform is known (https://arxiv.org/abs/2403.15506).
+
+#### 2. EccentricIMR 
 Python wrapper for the PN based quadrupolar eccentric waveform model (https://arxiv.org/abs/0806.1037). Example use is here: https://github.com/tousifislam/gwModels/blob/main/tutorials/EccentricIMR_example.ipynb
 
-#### 2. EccentricIMR-HM
-It has three variants based on the constituent circular model:
+#### 3. EccentricIMR-HM
+It has three variants based on the constituent circular model. These variants are obtained by combining the following circular and eccentric model through gwNRHME.
 - NRHybSur3dq8 (https://arxiv.org/abs/1812.07865) + EccentricIMR (https://arxiv.org/abs/0806.1037)
 - BHPTNRSur1dq1e4 (https://arxiv.org/abs/2204.01972) + EccentricIMR (https://arxiv.org/abs/0806.1037)
 - IMRPhenomTHM (https://arxiv.org/abs/2012.11923) + EccentricIMR (https://arxiv.org/abs/0806.1037)
