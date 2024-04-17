@@ -115,56 +115,6 @@ def generate_IMRPhenomTHM(mass_ratio, total_mass=10.0, ref_phase=0.0, Momega0Ove
 
     # geometric units; remove iota/phase contribution
     MT = total_mass * lal.MTSUN_SI
-    t_geo, h_geo = convert_physical_wf_to_geometric(h_dict, MT, dist)
-    
-    return t_geo, h_geo
-
-def generate_IMRPhenomTHM(mass_ratio, total_mass=10.0, ref_phase=0.0, Momega0OverM=0.02, 
-                         deltaTOverM=0.5, time_wfgeneration=True):
-    """
-    wrapper to generate EccentricTD waveform from lal
-    mass_ratio: m1/m2
-    total_mass: total mass in Msun
-    inclination: angle between line-of-sight and binary angular momentum 
-    ref_phase: initial reference phase
-    Momega0OverM: initial freqquency in geometric unit 
-    deltaTOverM: time-step in geometric unit
-    time_wfgeneration: if True, it prints the time taken to generate the waveform
-    """
-
-    # fiducial distance
-    dist = 1000
-    
-    # process all params for lal
-    deltaT, f_ref, f_low = obtain_time_fequency_inputs(total_mass, deltaTOverM, Momega0OverM)
-    m1, m2, s1, s2 = process_intrinsic_params(total_mass, mass_ratio)
-    inclination = 0.0
-    dist_SI, iota, phi_c = process_extrinsic_params(dist, inclination, ref_phase)
-    
-    # lal waveform dictionary
-    WFdict = create_lal_dict()
-    
-    if time_wfgeneration:
-        t1= time.time()
-
-    sphtseries = lalsim.SimIMRPhenomTHM_Modes(m1, m2,\
-                                             s1[2], s2[2],\
-                                             dist_SI, deltaT,\
-                                             f_low, f_ref,\
-                                             phi_c, WFdict)
-    
-        
-    if time_wfgeneration:
-        t2=time.time()
-        print('Time taken: %.5f'%(t2-t1))
-
-    MT = total_mass * lal.MTSUN_SI
-
-    # Data as dictionary
-    h_dict = process_IMRPheomTHM_output(sphtseries)
-
-    # geometric units; remove iota/phase contribution
-    MT = total_mass * lal.MTSUN_SI
     t_geo, h_geo = convert_physical_wf_to_geometric(h_dict, MT, dist, deltaTOverM)
     
     return t_geo, h_geo
