@@ -15,9 +15,6 @@ warnings.filterwarnings("ignore", "Wswiglal-redir-stdio")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from wolframclient.evaluation import WolframLanguageSession
-from wolframclient.language import wl, wlexpr
-
 # import gwModels
 import sys
 sys.path.append("/home/tousifislam/Documents/works/gwModels/")
