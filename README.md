@@ -18,11 +18,10 @@ A framework to seamlessly convert a multi-modal (i.e with several spherical harm
 #### 2. EccentricIMR 
 Python wrapper for the PN based quadrupolar eccentric waveform model (https://arxiv.org/abs/0806.1037). Example use is here: https://github.com/tousifislam/gwModels/blob/main/tutorials/EccentricIMR_example.ipynb
 
-#### 3. EccentricIMR-HM
-It has three variants based on the constituent circular model. These variants are obtained by combining the following circular and eccentric model through gwNRHME.
+#### 3. Higher modes model with eccentricity
+It has two variants based on the constituent circular model. These variants are obtained by combining the following circular and eccentric model through gwNRHME.
 - NRHybSur3dq8-gwNRHME = NRHybSur3dq8 (https://arxiv.org/abs/1812.07865) + EccentricIMR (https://arxiv.org/abs/0806.1037)
 - BHPTNRSur1dq1e4-gwNRHME = BHPTNRSur1dq1e4 (https://arxiv.org/abs/2204.01972) + EccentricIMR (https://arxiv.org/abs/0806.1037)
-- IMRPhenomTHM (https://arxiv.org/abs/2012.11923) + EccentricIMR (https://arxiv.org/abs/0806.1037)
 
 Example use is here: https://github.com/tousifislam/gwModels/blob/main/tutorials/
 
