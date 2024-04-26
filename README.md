@@ -60,7 +60,7 @@ This code is distributed under the MIT License. Details can be found in the LICE
 Tousif Islam
 
 ## Citation guideline
-If you make use of the gwModels framework, please cite the following paper:
+If you make use of the gwModels framework, please cite the following papers:
 
 ```
 @article{Islam:2024rhm,
