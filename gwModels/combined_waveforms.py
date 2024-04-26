@@ -127,20 +127,28 @@ class genNRHybSur3dq8:
         return t_sur, h_sur
 
 
-class EccentricIMRHM(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
+class IMRHME(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
     """
     Class to generate eccentric higher order spherical harmonics using
     EccentricIMR and a multi-modal circular model
     """
-    def __init__(self, wolfram_kernel_path, package_directory, circular_model, model=None):
+    def __init__(self, circular_model, wolfram_kernel_path=None, package_directory=None,  model=None):
         """
-        wolfram_kernel_path: absolute path for your mathematica kernel
-        package_directory: absolute path for the EccentricIMR package
         circular_model: name of the multi-modal circular model
                         e.g. 'NRHybSur3dq8', 'BHPTNRSur1dq1e4', 'IMRPhenomTHM'
+        wolfram_kernel_path: absolute path for your mathematica kernel
+        package_directory: absolute path for the EccentricIMR package
+        model: a model object for BHPTNRSur1dq1e4 model
         """
-        self.wolfram_kernel_path = wolfram_kernel_path
-        self.package_directory = package_directory
+        if wolfram_kernel_path is None:
+            raise ValueError("a path for the Wolfram Kernel must be given!")
+        else:
+            self.wolfram_kernel_path = wolfram_kernel_path
+        if package_directory is None:
+            raise ValueError("a path for the EccentricIMR package directory must be given!")
+        else:
+            self.package_directory = package_directory
+        
         self.circular_model = circular_model
         if self.circular_model == 'BHPTNRSur1dq1e4':
             if model is None:
@@ -172,11 +180,14 @@ class EccentricIMRHM(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
         elif self.circular_model == 'BHPTNRSur1dq1e4':
             # generate surrogate cicular waveform
             t_cir, h_cir = self.generate_BHPTNRSur1dq1e4(self.model, params)
-            print(len(t_cir), len(h_cir['h_l2m2']))
+
+        
         elif self.circular_model == 'IMRPhenomTHM':
             # generate IMRPhenomTHM model
             t_cir, h_cir = generate_IMRPhenomTHM(mass_ratio=params["q"],
                                                          Momega0OverM=params["fIMR"])
+        else:
+            raise ValueError("Model not implemented!")
             
         # use gwNRHME to obtain multi-modal
         tNRE, hNRE = self._apply_gwNRHME(t_ecc=tIMR, h_ecc_dict={'h_l2m2': hIMR},
@@ -198,9 +209,96 @@ class EccentricIMRHM(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
         converts circular higher modes to eccentric modes
         """
         hNRE_obj = NRHME(t_ecc, h_ecc_dict,
-                                            t_cir, h_cir_dict,
-                                            get_orbfreq_mod_from_amp_mod=False)
+                         t_cir, h_cir_dict,
+                         get_orbfreq_mod_from_amp_mod=False)
 
         tNRE = hNRE_obj.t_common
         hNRE = hNRE_obj.hNRE
+        return tNRE, hNRE
+
+
+class NRHybSur3dq8_gwNRHME():
+    """
+    Class to generate eccentric higher order spherical harmonics using
+    EccentricIMR and NRHybSur3dq8 model
+    """
+    def __init__(self, wolfram_kernel_path=None, package_directory=None):
+        """
+        wolfram_kernel_path: absolute path for your mathematica kernel
+        package_directory: absolute path for the EccentricIMR package
+        """
+
+        self.wf_obj = IMRHME(wolfram_kernel_path = wolfram_kernel_path, 
+                             package_directory = package_directory, 
+                             circular_model='NRHybSur3dq8')
+
+    def generate_waveform(self, params): 
+        """
+        user-friendly function to generate combined eccentric waveform
+        params: dictionary with keys "q", "e0", "l0", "x0"
+                q: mass ratio
+                e0: initial eccentricity at x0
+                l0: initial mean anomaly at x0
+                x0: initial dimensionless orbital frequency
+        """
+        # waveform
+        tNRE, hNRE = self.wf_obj.generate_waveform(params)
+        return tNRE, hNRE
+
+
+class BHPTNRSur1dq1e4_gwNRHME():
+    """
+    Class to generate eccentric higher order spherical harmonics using
+    EccentricIMR and BHPTNRSur1dq1e4 model
+    """
+    def __init__(self, wolfram_kernel_path=None, package_directory=None, model=None):
+        """
+        wolfram_kernel_path: absolute path for your mathematica kernel
+        package_directory: absolute path for the EccentricIMR package
+        """
+
+        self.wf_obj = IMRHME(wolfram_kernel_path = wolfram_kernel_path, 
+                        package_directory = package_directory, 
+                        circular_model='BHPTNRSur1dq1e4', model=model)
+
+    def generate_waveform(self, params): 
+        """
+        user-friendly function to generate combined eccentric waveform
+        params: dictionary with keys "q", "e0", "l0", "x0"
+                q: mass ratio
+                e0: initial eccentricity at x0
+                l0: initial mean anomaly at x0
+                x0: initial dimensionless orbital frequency
+        """
+        # waveform
+        tNRE, hNRE = self.wf_obj.generate_waveform(params)
+        return tNRE, hNRE
+
+
+class IMRPhenomTHM_gwNRHME():
+    """
+    Class to generate eccentric higher order spherical harmonics using
+    EccentricIMR and IMRPhenomTHM model
+    """
+    def __init__(self, wolfram_kernel_path=None, package_directory=None):
+        """
+        wolfram_kernel_path: absolute path for your mathematica kernel
+        package_directory: absolute path for the EccentricIMR package
+        """
+
+        self.wf_obj = IMRHME(wolfram_kernel_path = wolfram_kernel_path, 
+                             package_directory = package_directory, 
+                             circular_model='IMRPhenomTHM')
+
+    def generate_waveform(self, params): 
+        """
+        user-friendly function to generate combined eccentric waveform
+        params: dictionary with keys "q", "e0", "l0", "x0"
+                q: mass ratio
+                e0: initial eccentricity at x0
+                l0: initial mean anomaly at x0
+                x0: initial dimensionless orbital frequency
+        """
+        # waveform
+        tNRE, hNRE = self.wf_obj.generate_waveform(params)
         return tNRE, hNRE

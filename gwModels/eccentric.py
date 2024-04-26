@@ -175,7 +175,7 @@ class NRHME:
             else:
                 amplitude = self.twist_mode_amplitude(mode)
                 phase = self.twist_mode_phase(mode) 
-                phase = phase -phase[0]  + gwtools.phase(self.cir_wfobj.h_transform[mode])[0]
+                phase = phase - phase[0]  + gwtools.phase(self.cir_wfobj.h_transform[mode])[0]
                 hNRE[mode] = amplitude * np.exp(1j*phase)
         return hNRE
     
