@@ -74,6 +74,18 @@ If you make use of the gwModels framework, please cite the following paper:
 }
 ```
 
+```
+@article{Islam:2024tcs,
+    author = "Islam, Tousif",
+    title = "{Study of eccentric binary black hole mergers using numerical relativity and an inspiral-merger-ringdown model}",
+    eprint = "2403.03487",
+    archivePrefix = "arXiv",
+    primaryClass = "gr-qc",
+    month = "3",
+    year = "2024"
+}
+
+```
 
 
 
