@@ -1,0 +1,10 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: intro
+chapters:
+- file: EccentricIMR_example.ipynb
+- file: gwNRHE_example.ipynb
+- file: NRHybSur3dq8-gwNRHME_example.ipynb
+- file: BHPTNRSur1dq1e4-gwNRHME_example.ipynb
