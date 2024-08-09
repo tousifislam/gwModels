@@ -1,6 +1,7 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2403.15506-b31b1b.svg)](https://arxiv.org/abs/2403.15506)
 [![arXiv](https://img.shields.io/badge/arXiv-2403.03487-b31b1b.svg)](https://arxiv.org/abs/2403.03487)
 [![arXiv](https://img.shields.io/badge/arXiv-2408.02762-b31b1b.svg)](https://arxiv.org/abs/2408.02762)
+[![Documentation Status](http://tousifislam.com/gwModels/gwModels.html)](http://tousifislam.com/gwModels/gwModels.html)
 ![alt text](gwModels.png)
 
 ## **gwModels**
