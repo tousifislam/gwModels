@@ -1,5 +1,6 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2403.15506-b31b1b.svg)](https://arxiv.org/abs/2403.15506)
 [![arXiv](https://img.shields.io/badge/arXiv-2403.03487-b31b1b.svg)](https://arxiv.org/abs/2403.03487)
+[![arXiv](https://img.shields.io/badge/arXiv-2408.02762-b31b1b.svg)](https://arxiv.org/abs/2408.02762)
 ![alt text](gwModels.png)
 
 ## **gwModels**
@@ -85,7 +86,18 @@ If you make use of the gwModels framework, please cite the following papers:
     month = "3",
     year = "2024"
 }
+```
 
+```
+@article{Islam:2024zqo,
+    author = "Islam, Tousif and Khanna, Gaurav and Field, Scott E.",
+    title = "{Adding higher-order spherical harmonics in non-spinning eccentric binary black hole merger waveform models}",
+    eprint = "2408.02762",
+    archivePrefix = "arXiv",
+    primaryClass = "gr-qc",
+    month = "8",
+    year = "2024"
+}
 ```
 
 
