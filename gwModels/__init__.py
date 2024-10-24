@@ -8,3 +8,8 @@ except:
 from .lal_models import *
 from .rcparams import *
 from .combined_waveforms import *
+from .compute_peaks import *
+from .compute_eccentricity import *
+from .eccentric_utils import *
+from .eccentric_pn_expressions import *
+
