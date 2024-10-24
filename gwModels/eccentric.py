@@ -24,7 +24,8 @@ class NRHME:
     if the quadrupolar eccentric waveform is known
     """
     def __init__(self, t_ecc=None, h_ecc_dict=None, t_cir=None, h_cir_dict=None, 
-                 get_orbfreq_mod_from_amp_mod=False, recompute_tpeak=True):
+                 get_orbfreq_mod_from_amp_mod=False, recompute_tpeak=True,
+                 project_ecc_on_higher_modes=True, t_buffer=100, end_time=100):
         """
         t_ecc: time array for the eccentric 22 mode waveform
         h_ecc_dict: dictionary of eccentric wavefform modes. Should only contain 22 mode
@@ -35,6 +36,12 @@ class NRHME:
                                       If True, we compute the modulation in the orbital frequency from the amplitude
                                       modulation itself. This is recommended when the 22 mode eccentric amplitude 
                                       model is
+        project_ecc_on_higher_modes: True (default);
+                     In that case, it will try to twist all higher order spherical harmonic modes to 
+                     include effect of eccentricity.
+                     If you want to just compute the modulations, please turn this flag off.
+        t_buffer: buffer time usually excluded at the beginning of the data
+        end_time: final time to keep in the common time grid
         """
         self.t_ecc = t_ecc
         self.h_ecc_dict = h_ecc_dict
@@ -59,11 +66,18 @@ class NRHME:
         else:
             raise ValueError("Mode key not recognized. Please use dictionary keys as '(2,2)' or 'h_l2m2' format")
             
+        # get buffer time
+        self.t_buffer = t_buffer
+        self.end_time = end_time
+        
         # should we compute orbital frequency modulation separately
         self.get_orbfreq_mod_from_amp_mod = get_orbfreq_mod_from_amp_mod
         
         # should we recompute where the peaks are
         self.recompute_tpeak = recompute_tpeak
+        
+        # whether to project eccentricity on higher order modes
+        self.project_ecc_on_higher_modes = project_ecc_on_higher_modes
         
         # align peaks
         if self.recompute_tpeak:
@@ -80,7 +94,8 @@ class NRHME:
         self.xi_omega = self.obtain_orbfreq_modulation()
         
         # updated eccentric multimodal waveforms
-        self.hNRE = self.obtain_eccentricHM()
+        if self.project_ecc_on_higher_modes:
+            self.hNRE = self.obtain_eccentricHM()
         
     
     def align_peaks(self):
@@ -99,10 +114,8 @@ class NRHME:
         construct a common time-grid between the circular waveform and the eccentric
         22 mode waveform
         """
-        t_buffer = 100
-        end_time = 100
-        tmin = max(min(self.t_cir),min(self.t_ecc)) + t_buffer
-        tmax = min(max(self.t_cir),max(self.t_ecc),end_time)
+        tmin = max(min(self.t_cir),min(self.t_ecc)) + self.t_buffer
+        tmax = min(max(self.t_cir),max(self.t_ecc), self.end_time)
         tcommon = np.arange(tmin,tmax,0.1)
         return tcommon
     

@@ -34,7 +34,7 @@ class EccentricIMR():
         self.wolfram_kernel_path = wolfram_kernel_path
         self.package_directory = package_directory
         # start a session
-        self.session = WolframLanguageSession(wolfram_kernel_path) 
+        self.session = WolframLanguageSession(self.wolfram_kernel_path) 
         self._load_mathematica_package()
         
     def _load_mathematica_package(self):
