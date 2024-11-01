@@ -2,7 +2,7 @@
 #-*- coding: utf-8 -*-
 #==============================================================================
 #
-#    FILE: eccentric.py
+#    FILE: gwnrhme.py
 #
 #    AUTHOR: Tousif Islam
 #    CREATED: 07-02-2024
@@ -14,7 +14,7 @@ __author__ = "Tousif Islam"
 import numpy as np
 import gwtools
 from scipy.interpolate import InterpolatedUnivariateSpline as spline
-from .utility import *
+from ..utility import *
 import gwtools
 import scipy
 
