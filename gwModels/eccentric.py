@@ -10,7 +10,7 @@
 #      REVISION: ---
 #==============================================================================
 
-__author__      = "Tousif Islam"
+__author__ = "Tousif Islam"
 
 import numpy as np
 import gwtools
