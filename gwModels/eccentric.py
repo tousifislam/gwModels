@@ -21,9 +21,10 @@ import scipy
 
 class NRHME:
     """
-    Class to seamlessly convert a multi-modal quasi-circular spherical
-    harmonic waveform into eccentric waveform spherical harmonic waveform 
-    if the quadrupolar eccentric waveform is known
+    Class to seamlessly convert a multi-modal (several spherical
+    harmonic modes present) quasi-circular non-spinning waveform 
+    into multi-modal eccentric non-spinning waveform if the 
+    non-spinning quadrupolar eccentric waveform is known
     """
     def __init__(self, t_ecc=None, h_ecc_dict=None, t_cir=None, h_cir_dict=None, 
                  get_orbfreq_mod_from_amp_mod=False, recompute_tpeak=True,
