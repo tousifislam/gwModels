@@ -14,7 +14,7 @@ __author__ = "Tousif Islam"
 import numpy as np
 import gwtools
 from scipy.interpolate import InterpolatedUnivariateSpline as spline
-from ..utility import *
+from ..utils import *
 import gwtools
 import scipy
 
