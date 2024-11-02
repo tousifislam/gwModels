@@ -18,12 +18,20 @@ import gwtools
 from scipy.interpolate import InterpolatedUnivariateSpline as spline
 
 def get_peak(t, func):
-    """
-    Finds the peak time of a function quadratically
-    Fits the function to a quadratic over the 5 points closest to the argmax func.
-    t : an array of times
-    func : array of function values
-    Returns: tpeak, fpeak
+    """"
+    Finds the peak time of a function using spline.
+    
+    Fits the provided function over the five points
+    closest to the argmax of the function to accurately find the peak.
+
+    Parameters:
+    t (np.ndarray): An array of times.
+    func (np.ndarray): An array of function values.
+
+    Returns:
+    tuple: A tuple containing:
+        - tpeak (float): The time at which the peak occurs.
+        - fpeak (float): The function value at the peak.
     """
     # Use a 4th degree spline for interpolation, so that the roots of its derivative can be found easily.
     spl = spline(t, func, k=4)
@@ -40,8 +48,17 @@ def get_peak(t, func):
 
 def check_pi_rotation(h_dict):
     """
-    Checks whether a pi rotation is required in waveform mode data
-    h_dict: dictionary of gravitational waves modes. Keys should be "h_l2m2" and so on
+    Checks whether a pi rotation is required in waveform mode data.
+
+    This function determines the phase factor required for each mode based on 
+    the phase of the `h_l2m1` mode, applying a pi rotation for odd m modes 
+    if necessary.
+
+    Parameters:
+    h_dict (dict): Dictionary of gravitational wave modes. Keys should be "h_l2m2", "h_l2m1", etc.
+
+    Returns:
+    dict: Updated dictionary of gravitational wave modes after potential rotation.
     """
     phi = gwtools.phase(h_dict['h_l2m1'])
     # decide whether to perform a physical \pi rotation
@@ -66,7 +83,18 @@ def check_pi_rotation(h_dict):
     
 def mathcalE_error(h1, h2):
     """
-    time-domain error via Eq 21 https://arxiv.org/pdf/1701.00550.pdf 
+    Computes the time-domain error between two waveforms.
+
+    This function calculates the error according to Equation 21 from the paper 
+    (https://arxiv.org/pdf/1701.00550.pdf) by normalizing the difference between 
+    the two waveforms.
+
+    Parameters:
+    h1 (np.ndarray): Reference waveform in the time domain.
+    h2 (np.ndarray): Comparison waveform in the time domain.
+
+    Returns:
+    np.ndarray: Normalized error for each time sample.
     """
     n1Sqr = np.sum(abs(h1**2))
     n2Sqr = np.sum(abs(h2**2))
@@ -80,7 +108,18 @@ def mathcalE_error(h1, h2):
 
 def phase_align_dict(hdict):
     """
-    align waveform dict to have proper phases
+    Aligns a waveform dictionary to ensure proper phases.
+
+    This function modifies the phases of the waveform modes to ensure that the 
+    initial phase of the (2,2) mode is zero and that the relative phases 
+    of higher modes are consistent.
+
+    Parameters:
+    hdict (dict): Dictionary of gravitational wave modes. Keys should include 
+                  'h_l2m2', 'h_l3m3', etc.
+
+    Returns:
+    dict: A new dictionary with aligned phases for each mode.
     """
     hdict_out = {}
     phi=np.unwrap(np.angle(hdict['h_l2m2']))
@@ -101,8 +140,21 @@ def phase_align_dict(hdict):
 
 class AlignWFData:
     """
-    Class to align a waveform such that peak is at t=0 and the initial phase is zero;
-    It also cast the waveform in a different time-grid
+    Class to align a waveform such that the peak is at t=0 and the initial phase is zero.
+
+    This class also casts the waveform onto a different time grid if specified.
+
+    Attributes:
+    t_input (np.ndarray): Input time array.
+    h_input (dict): Input waveform dictionary with keys as spherical harmonics modes.
+    t_common (np.ndarray or None): Target time grid on which waveform data should be cast.
+
+    Methods:
+    _find_peak_time(): Finds the time of the peak for the (2,2) mode.
+    _align_time(): Aligns the waveform to ensure the peak is at t=0.
+    _find_offset_orb_phase(): Finds the phase rotation to set the initial (2,2) mode phase to zero.
+    _align_phase(): Aligns the phases of the waveform modes.
+    _cast_waveform_on_timegrid(): Casts the waveform onto the specified time grid.
     """
     def __init__(self, t_input, h_input, t_common=None):
         """
@@ -134,8 +186,11 @@ class AlignWFData:
         
     def _cast_waveform_on_timegrid(self):
         """
-        cast the waveform onto a new time grid;
-        this step should be done after the time alignement
+        Casts the waveform onto a new time grid.
+        This method should be called after the time alignment has been completed.
+
+        Returns:
+        dict: A dictionary of waveforms aligned on the new time grid.
         """
         h_transform = {}
         for mode in self.h_input.keys():
@@ -144,26 +199,36 @@ class AlignWFData:
     
     def _find_peak_time(self):
         """
-        find the time corresponding to the peak of the (2,2) mode
+        Finds the time corresponding to the peak of the (2,2) mode.
+
+        Returns:
+        float: The time at which the peak of the (2,2) mode occurs.
         """
         return np.real(get_peak(self.t_input, abs(self.h_input['h_l2m2']))[0])
         
     def _align_time(self):
         """
-        align the waveform such that the peak of the (2,2) mode is at t=0
+        Aligns the waveform such that the peak of the (2,2) mode is at t=0.
+
+        Returns:
+        np.ndarray: The transformed time array with the peak aligned to zero.
         """
         return self.t_input - self.t_peak
     
     def _find_offset_orb_phase(self):
         """
-        find the phase rotation required to make the initial (2,2) mode phase to be zero
+        Finds the phase rotation required to make the initial (2,2) mode phase zero.
+
+        Returns:
+        float: The phase rotation to apply.
         """
         phi = gwtools.phase(self.h_transform['h_l2m2'])
         return phi[0]/2.0
     
     def _align_phase(self):
         """
-        enforce correct relative phasing such that initial (2,2) mode phase is zero
+        Enforces correct relative phasing such that the initial (2,2) mode phase is zero.
+        This modifies each mode in the waveform to ensure consistent phase alignment.
         """
         for mode in self.h_transform.keys():
             phi = gwtools.phase(self.h_transform[mode])
