@@ -4,11 +4,12 @@
 #
 #     FILE: lal_models
 #
-#        AUTHOR: Tousif Islam
-#       CREATED: 07-02-2024
-# LAST MODIFIED: Tue Feb  7 17:58:52 2024
-#      REVISION: ---
+#     AUTHOR: Tousif Islam
+#     CREATED: 07-02-2024
+#     LAST MODIFIED: Tue Feb  7 17:58:52 2024
+#     REVISION: ---
 #==============================================================================
+__author__ = "Tousif Islam"
 
 import warnings
 warnings.filterwarnings('ignore')
