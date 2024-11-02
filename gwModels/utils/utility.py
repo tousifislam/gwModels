@@ -3,14 +3,15 @@
 #==============================================================================
 #
 #    FILE: utility.py
-#    [ This piece of code is a modification of a similar code in gw_remnant package ] 
-# 
+#    [ This piece of code is a modification of a similar code in gw_remnant package 
+#      written by Tousif Islam ] 
 #
-#        AUTHOR: Tousif Islam
-#       CREATED: 07-02-2024
-# LAST MODIFIED: Tue Feb  6 17:58:52 2024
-#      REVISION: ---
+#    AUTHOR: Tousif Islam
+#    CREATED: 07-02-2024
+#    LAST MODIFIED: Tue Feb  6 17:58:52 2024
+#    REVISION: ---
 #==============================================================================
+__author__ = "Tousif Islam"
 
 import numpy as np
 import gwtools

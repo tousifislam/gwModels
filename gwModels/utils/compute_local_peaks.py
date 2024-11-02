@@ -2,7 +2,7 @@
 #-*- coding: utf-8 -*-
 #==============================================================================
 #
-#    FILE: compute_peaks.py
+#    FILE: compute_local_peaks.py
 #    Computes peaks of an oscillatory function
 #
 #    AUTHOR: Tousif Islam
