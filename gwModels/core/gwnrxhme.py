@@ -29,27 +29,25 @@ class NRXHME:
                  get_orbfreq_mod_from_amp_mod=False, recompute_tpeak=True,
                  project_ecc_on_higher_modes=True, t_buffer=100, end_time=100):
         """
-        Inputs:
-            t_ecc: time array for the eccentric 22 mode waveform
-            h_ecc_dict: dictionary of eccentric non--precessing wavefform modes. Should only contain 22 mode
-            t_cir: time array for the circular waveform modes
-            h_cir_dict: dictionary of circular non-precessing waveform modes
-                        keys should be 'h_l2m2', 'h_l2m1' and so on
-            get_orbfreq_mod_from_amp_mod: False;
-                                          If True, we compute the modulation in the orbital frequency from the amplitude
-                                          modulation itself. This is recommended when the 22 mode eccentric amplitude 
-                                          model is
-            project_ecc_on_higher_modes: True (default);
-                         In that case, it will try to twist all higher order spherical harmonic modes to 
-                         include effect of eccentricity.
-                         If you want to just compute the modulations, please turn this flag off.
-            t_buffer: buffer time usually excluded at the beginning of the data
-            end_time: final time to keep in the common time grid
+        Initializes the NRHME class.
 
+        Parameters:
+            t_ecc (array): Time array for the eccentric 22 mode waveform.
+            h_ecc_dict (dict): Dictionary of eccentric waveform modes, should only contain the 22 mode.
+            t_cir (array): Time array for the circular waveform modes.
+            h_cir_dict (dict): Dictionary of circular non-precessing waveform modes. 
+                               Keys should include 'h_l2m2', 'h_l2m1', etc.
+            get_orbfreq_mod_from_amp_mod (bool): If True, computes the modulation in the orbital frequency 
+                                                  from the amplitude modulation itself. Default is False.
+            recompute_tpeak (bool): If True, recomputes the peaks of the waveforms. Default is True.
+            project_ecc_on_higher_modes (bool): If True, projects the effect of eccentricity onto higher-order 
+                                                 spherical harmonic modes. Default is True.
+            t_buffer (float): Buffer time to exclude at the beginning of the data. Default is 100.
+            end_time (float): Final time to keep in the common time grid. Default is 100.
+        
         Calculates: 
-                  multi-modal eccentric non-precessing waveform
+            Multi-modal eccentric non-precessing waveform.
         """
-
         # read eccentric waveforms
         self.t_ecc = t_ecc
         self.h_ecc_dict = h_ecc_dict
@@ -112,8 +110,8 @@ class NRXHME:
     
     def align_peaks(self):
         """
-        Align all waveforms so that merger occurs at t=0
-        we define merger at the point where 22 mode amplitude is the largest
+        Aligns all waveforms such that the merger occurs at t=0.
+        The merger is defined as the point where the 22 mode amplitude is the largest.
         """
         # find the peak for the circular waveform
         tpeak_cir = get_peak(self.t_cir, abs(self.h_cir_dict['h_l2m2']))[0]
@@ -127,8 +125,11 @@ class NRXHME:
         
     def obtain_common_timegrid(self):
         """
-        Construct a common time-grid between the circular waveform 
-        and the eccentric 22 mode waveform
+        Constructs a common time grid between the circular waveform 
+        and the eccentric 22 mode waveform.
+
+        Returns:
+            array: Common time grid array.
         """
         # minimum time in the common grid
         tmin = max(min(self.t_cir),min(self.t_ecc)) + self.t_buffer
@@ -141,8 +142,8 @@ class NRXHME:
     
     def obtain_amplitude_modulation(self):
         """
-        Compute the amplitude modulation from the 22 mode eccentric 
-        and 22 mode quasicircular waveform
+        Computes the amplitude modulation from the 22 mode eccentric 
+        and circular waveforms.
         """
         # eccentric 22 amplitude
         ecc_quadrupole_amp = abs(self.ecc_wfobj.h_transform['h_l2m2'])
@@ -155,10 +156,9 @@ class NRXHME:
     
     def obtain_orbfreq_modulation(self):
         """
-        Compute the orbital frequency modulation from the 22 mode eccentric 
-        and 22 mode quasicircular waveform;
-        When get_orbfreq_mod_from_amp_mod flag is turned on, we will use the amplitude modulation
-        and scale it appropritaely to obtain the frequency modulations
+        Computes the eccentric frequency modulation from the 22 mode eccentric 
+        and circular waveforms. If get_orbfreq_mod_from_amp_mod is True, 
+        it uses the amplitude modulation to scale frequency modulations.
         """
         if self.get_orbfreq_mod_from_amp_mod is False:
             # obtain frequency modulation from the 22 mode of the waveform data itself
@@ -175,7 +175,14 @@ class NRXHME:
         
     def twist_mode_amplitude(self, mode):
         """
-        Turn each circular mode amplitude into their corresponding eccentric mode amplitude
+        Convert the amplitude of a circular mode to its corresponding eccentric mode amplitude.
+    
+        Parameters:
+            mode (str): The mode identifier (e.g., 'h_l2m2').
+    
+        Returns:
+            float: The projected amplitude of the corresponding eccentric mode, 
+                   calculated using Eq(9) of the referenced paper.
         """
         # find out the ell value of the mode
         ell = float(mode.rsplit("_l")[-1].rsplit("m")[0])
@@ -189,7 +196,15 @@ class NRXHME:
     
     def twist_mode_orbital_frequency(self, mode):
         """
-        Turn each circular mode orbital frequency into their corresponding eccentric mode orbital frequency
+        Convert the orbital frequency of a circular mode to its corresponding 
+        eccentric mode orbital frequency.
+    
+        Parameters:
+            mode (str): The mode identifier (e.g., 'h_l2m2').
+    
+        Returns:
+            float: The projected orbital frequency of the corresponding eccentric mode, 
+                   calculated using Eq(10) of the referenced paper.
         """
         cir_frequency = get_frequency(self.t_common, self.cir_wfobj.h_transform[mode])
         # compute the frequency of the corresponding mode
@@ -200,7 +215,14 @@ class NRXHME:
     
     def twist_mode_phase(self, mode):
         """
-        Obtain eccentric phase term for a given mode using orbital frequency modulation
+        Obtain the eccentric phase term for a given mode using orbital frequency modulation.
+    
+        Parameters:
+            mode (str): The mode identifier (e.g., 'h_l2m2').
+    
+        Returns:
+            array: The computed phase of the corresponding eccentric mode, calculated using 
+                   Eq(11) of the referenced paper. The integration constant is set to 0.
         """
         omega =  self.twist_mode_orbital_frequency(mode)
         
@@ -220,7 +242,13 @@ class NRXHME:
         
     def twist_modes(self):
         """
-        Twist a circular waveform mode into eccentric waveform mode
+        Transform circular waveform modes into eccentric waveform modes.
+
+        Returns:
+            dict: A dictionary containing the transformed eccentric waveform modes.
+                  The amplitude and phase of the 'h_l2m2' mode remain unchanged,
+                  while other modes are modified according to their respective 
+                  projected amplitudes and phases.
         """
         # using Eq(11) of https://arxiv.org/pdf/2403.15506
         hNRE = {}
@@ -250,8 +278,12 @@ class NRXHME:
     
     def obtain_eccentricHM(self):
         """
-        Align eccentric modes properly in phases and times 
-        so that the initial phase is equal to the circular one
+        Align eccentric modes in phases and times so that the initial phase matches 
+        the corresponding circular phase.
+    
+        Returns:
+            dict: A dictionary containing the aligned eccentric higher-order 
+                  multipole waveform modes, ensuring initial phase alignment.
         """
         # all higher order spherical harmonics with eccentricity is obtained
         gwhNRE = self.twist_modes()
