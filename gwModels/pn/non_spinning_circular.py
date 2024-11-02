@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 
 from .pn_utils import *
 from ..utils import mass_ratio_to_symmetric_mass_ratio
+from ..utils import get_phase, get_frequency
 
 def x_of_tau(tau, q):
     """
@@ -617,9 +618,11 @@ class Blanchet2024:
         else:
             self.x = x_of_t(self.t, self.q)
 
-        self.E = self.compute_energy()
-        self.F = self.compute_fluxes()
-        self.ht = self.compute_waveform()
+        self.E_dict = self.compute_energy()
+        self.F_dict = self.compute_fluxes()
+        self.ht_dict = self.compute_waveform()
+        self.phase_dict = self.compute_phases()
+        self.omega_dict = self.compute_frequencies()
 
     def compute_energy(self):
         """Compute energy E for different PN orders."""
@@ -648,10 +651,24 @@ class Blanchet2024:
 
         return ht
 
+    def compute_phases(self):
+        """Compute the overall phases of gravitational waveforms ht at different PN orders"""
+        phase = {}
+        for key in self.ht_dict.keys():
+            phase[key] = get_phase(self.ht_dict[key])
+        return phase
+
+    def compute_frequencies(self):
+        """Compute overall frequency of gravitational waveforms ht at different PN orders"""
+        omega = {}
+        for key in self.ht_dict.keys():
+            omega[key] = get_frequency(self.t, self.ht_dict[key])
+        return omega
+
     def plot_waveform(self):
         """Plot the waveform ht for different PN orders."""
-        for key in self.ht.keys():
-            plt.plot(self.t, self.ht[key], label=f'PN Order {key}')
+        for key in self.ht_dict.keys():
+            plt.plot(self.t, self.ht_dict[key], label=f'PN Order {key}')
         plt.ylim(-0.5, 0.5)
         plt.xlabel('Time', fontsize=18)
         plt.ylabel('Strain', fontsize=18)
