@@ -2,31 +2,32 @@
 #-*- coding: utf-8 -*-
 #==============================================================================
 #
-#    FILE: eccentric.py
+#    FILE: eccentricimr_wolfram.py
 #
-#        AUTHOR: Tousif Islam
-#       CREATED: 07-03-2024
-# LAST MODIFIED: Tue Feb  6 17:58:52 2024
-#      REVISION: ---
+#    AUTHOR: Tousif Islam
+#    CREATED: 07-03-2024
+#    LAST MODIFIED: Tue Feb  6 17:58:52 2024
+#    REVISION: ---
 #==============================================================================
-"""
-Code to generate eccentric BBH merger waveform using a PN+NR IMR model built by Hinder et al.
-This is a python wrapper to work efficiently with the original Mathematica code
-Author: Tousif Islam
-Date: Dec 22, 2023
-"""
-from wolframclient.evaluation import WolframLanguageSession
-from wolframclient.language import wl, wlexpr
+__author__ = "Tousif Islam"
+
+try:
+    from wolframclient.evaluation import WolframLanguageSession
+    from wolframclient.language import wl, wlexpr
+except:
+    print("ModuleNotFound: 'wolframclient' - EccentricIMR wrapper for Mathematica would not work!")
+    
 import matplotlib.pyplot as plt
 import numpy as np
 from ..utils import *
 
 class EccentricIMR():
     """
-    EccentricIMR model class based on the following paper -
-    Year: 2017
-    Link: http://arxiv.org/abs/1709.02007, Hinder, Kidder and Pfeiffer
-    Github repo: https://github.com/ianhinder/EccentricIMR/tree/master
+    EccentricIMR model class based on the following paper:
+        Authors: Hinder, Kidder and Pfeiffer
+        Year: 2017
+        Link: http://arxiv.org/abs/1709.02007
+        Github repo: https://github.com/ianhinder/EccentricIMR/tree/master
     """
     def __init__(self, wolfram_kernel_path, package_directory):
         self.wolfram_kernel_path = wolfram_kernel_path
@@ -47,8 +48,8 @@ class EccentricIMR():
         
     def generate_waveform(self, params):
         """
-        Generate the waveform using mathematica package
-        converts the mathematica time/hstrain output into python outputs
+        Generate the waveform using mathematica package;
+        Converts the mathematica time/hstrain output into python outputs
         """
         # Generate the code for EccentricIMRWaveform
         param_list = ', '.join([f'"{key}" -> {value}' for key, value in params.items()])
@@ -72,14 +73,17 @@ class EccentricIMR():
     def peak_time(self, t, modes):
         """
         Finds the peak time quadratically, using 22 mode
-        t : an array of times
-        modes : a list/array of waveform mode arrays, OR a single mode.
-                Each mode should have type numpy.ndarray
+            t : an array of times
+            modes : a list/array of waveform mode arrays, OR a single mode.
+                    Each mode should have type numpy.ndarray
         """
         normSqrVsT = abs(modes)**2
         return get_peak(t, normSqrVsT)[0]
 
     def plot_waveform(self, time, complex_value_python):
+        """
+        Plots EccentricIMR waveform
+        """
         plt.figure(figsize=(8,4))
         plt.plot(time, np.real(complex_value_python), label='real part')
         plt.plot(time, np.imag(complex_value_python), label='imag part')
