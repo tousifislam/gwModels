@@ -70,7 +70,7 @@ def generate_EccentricTD(mass_ratio, total_mass=10.0, inclination=0.0,
     return t_geo, h_geo
 
 
-def generate_IMRPhenomTHM(mass_ratio, total_mass=10.0, ref_phase=0.0, Momega0OverM=0.02, 
+def generate_IMRPhenomTHM(mass_ratio, total_mass=10.0, s1z=0.0, s2z=0.0, ref_phase=0.0, Momega0OverM=0.02, 
                          deltaTOverM=0.5, time_wfgeneration=True):
     """
     wrapper to generate EccentricTD waveform from lal
@@ -88,7 +88,7 @@ def generate_IMRPhenomTHM(mass_ratio, total_mass=10.0, ref_phase=0.0, Momega0Ove
     
     # process all params for lal
     deltaT, f_ref, f_low = obtain_time_fequency_inputs(total_mass, deltaTOverM, Momega0OverM)
-    m1, m2, s1, s2 = process_intrinsic_params(total_mass, mass_ratio)
+    m1, m2, s1, s2 = process_intrinsic_params(total_mass, mass_ratio, s1z, s2z)
     inclination = 0.0
     dist_SI, iota, phi_c = process_extrinsic_params(dist, inclination, ref_phase)
     
@@ -176,7 +176,7 @@ def obtain_time_fequency_inputs(total_mass, deltaTOverM, Momega0OverM):
     return deltaT, f_ref, f_low
     
     
-def process_intrinsic_params(total_mass, mass_ratio):
+def process_intrinsic_params(total_mass, mass_ratio, s1z=0.0, s2z=0.0):
     """
     process initial mass, spin inputs for lalsimulation
     """
@@ -184,8 +184,8 @@ def process_intrinsic_params(total_mass, mass_ratio):
     m1 = total_mass * lal.MSUN_SI * mass_ratio / (1. + mass_ratio)
     m2 = total_mass * lal.MSUN_SI / (1. + mass_ratio)
     # spins
-    s1 = [0, 0, 0]
-    s2 = [0, 0, 0]
+    s1 = [0, 0, s1z]
+    s2 = [0, 0, s2z]
     return m1, m2, s1, s2
 
 
