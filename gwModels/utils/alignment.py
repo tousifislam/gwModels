@@ -2,7 +2,7 @@
 #-*- coding: utf-8 -*-
 #==============================================================================
 #
-#    FILE: utility.py
+#    FILE: alignment.py
 #    [ This piece of code is a modification of a similar code in gw_remnant package 
 #      written by Tousif Islam ] 
 #
