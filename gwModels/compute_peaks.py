@@ -5,10 +5,11 @@
 #    FILE: compute_peaks.py
 #    Computes peaks of an oscillatory function
 #
-#        AUTHOR: Tousif Islam
-#       CREATED: 08-08-2024
-#      REVISION: ---
+#    AUTHOR: Tousif Islam
+#    CREATED: 08-08-2024
+#    REVISION: ---
 #==============================================================================
+__author__ = "Tousif Islam"
 
 import numpy as np
 import warnings
