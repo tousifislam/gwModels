@@ -38,15 +38,6 @@ def get_peak(t, func):
     return cr_pts[max_index], cr_vals[max_index]
 
 
-def get_frequency(t, h):
-    """
-    Computes orbital frequency of a given gravitational wave time-series
-    t: time array
-    h: waveform mode array
-    """
-    return np.gradient(gwtools.phase(h), t)
-
-
 def check_pi_rotation(h_dict):
     """
     Checks whether a pi rotation is required in waveform mode data
