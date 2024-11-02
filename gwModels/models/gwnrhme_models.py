@@ -26,19 +26,20 @@ from ..utils import *
 class IMRHME(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
     """
     Class to generate eccentric non-spinning higher order spherical harmonics using
-    a quadrupolar eccentric waveform model and a multi-modal circular model
+    a quadrupolar eccentric waveform model and a multi-modal circular model.
     """
     def __init__(self, circular_model, eccentric_model, **kwargs):
         """
-        circular_model: name of the multi-modal circular model
-                        e.g. 'NRHybSur3dq8', 'BHPTNRSur1dq1e4', 'IMRPhenomTHM'
-        eccentric_model: name of the quadrupolar eccentric model
-                        e.g. 'EccentricIMR'
-        kwargs: additional details of the circular and eccentric models
-                e.g.
-                    - wolfram_kernel_path: absolute path for your mathematica kernel
-                    - package_directory: absolute path for the EccentricIMR package
-                    - model_obj: a model object for BHPTNRSur1dq1e4 model
+        Attributes:
+        
+        circular_model (str): Name of the multi-modal circular model 
+                        (e.g., 'NRHybSur3dq8', 'BHPTNRSur1dq1e4', 'IMRPhenomTHM').
+        eccentric_model (str): Name of the quadrupolar eccentric model 
+                        (e.g., 'EccentricIMR').
+        kwargs (dict): Optional keyword arguments including:
+            - wolfram_kernel_path (str): Absolute path for the Mathematica kernel.
+            - package_directory (str): Absolute path for the EccentricIMR package.
+            - model_obj (object): A model object for BHPTNRSur1dq1e4 model.
         """
 
         # read all the options
@@ -54,7 +55,6 @@ class IMRHME(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
             if self.model_obj is None:
                 raise ValueError("... a model object for BHPTNRSur1dq1e4 must be provided!")
 
-            
         # eccentric model
         self.eccentric_model = eccentric_model
         # raise error if it is not EccentricIMR
@@ -78,12 +78,19 @@ class IMRHME(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
 
     def generate_waveform(self, params): 
         """
-        User-friendly function to generate combined eccentric waveform
-        params: dictionary with keys "q", "e0", "l0", "x0"
-                - q: mass ratio
-                - e0: initial eccentricity at x0
-                - l0: initial mean anomaly at x0
-                - x0: initial dimensionless orbital frequency
+        Generates a combined eccentric waveform based on the specified parameters.
+
+        Parameters:
+            params (dict): Dictionary containing waveform parameters with the following keys:
+                - q (float): Mass ratio of the binary system.
+                - e0 (float): Initial eccentricity at x0.
+                - l0 (float): Initial mean anomaly at x0.
+                - x0 (float): Initial dimensionless orbital frequency.
+
+        Returns:
+            tuple: A tuple containing:
+                - tNRE (numpy.ndarray): Time array for the generated eccentric waveform.
+                - hNRE (numpy.ndarray): Generated eccentric waveform data.
         """
 
         # Check for "s1z" and "s2z" keys and ensure they corresponds to the non-spinning case
@@ -130,8 +137,16 @@ class IMRHME(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
     
     def _obtain_circular_flow(self, tIMR, hIMR):
         """
-        Obtains start frequency of the eccentric waveform
-        this fequency is then passed to the circular waveform as f_low
+        Computes the starting frequency of the eccentric waveform.
+
+        This frequency is passed to the circular waveform as f_low.
+
+        Parameters:
+            tIMR (numpy.ndarray): Time array for the generated eccentric waveform.
+            hIMR (numpy.ndarray): Eccentric waveform data.
+
+        Returns:
+            float: The starting frequency of the eccentric waveform.
         """
         fIMR = 0.9 * abs(get_frequency(tIMR, hIMR)[0])/(np.pi)
         return fIMR
@@ -139,7 +154,18 @@ class IMRHME(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
     
     def _apply_gwNRHME(self, t_ecc, h_ecc_dict, t_cir, h_cir_dict):
         """
-        Converts circular higher modes to eccentric modes
+        Converts circular higher modes to eccentric modes.
+
+        Parameters:
+            t_ecc (numpy.ndarray): Time array for the eccentric waveform.
+            h_ecc_dict (dict): Dictionary of eccentric waveform data.
+            t_cir (numpy.ndarray): Time array for the circular waveform.
+            h_cir_dict (dict): Dictionary of circular waveform data.
+
+        Returns:
+            tuple: A tuple containing:
+                - tNRE (numpy.ndarray): Time array for the converted eccentric waveform.
+                - hNRE (numpy.ndarray): Converted eccentric waveform data.
         """
         hNRE_obj = NRHME(t_ecc, h_ecc_dict,
                          t_cir, h_cir_dict,
@@ -153,15 +179,16 @@ class IMRHME(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
 class NRHybSur3dq8_gwNRHME():
     """
     Class to generate eccentric higher order spherical harmonics using
-    EccentricIMR and NRHybSur3dq8 model
+    EccentricIMR and NRHybSur3dq8 model.
     """
     def __init__(self, eccentric_model='EccentricIMR', **kwargs):
         """
-        eccentric_model: name of the eccentric quadrupolar model
-        kwargs: all details about circular and eccentric models 
-                e.g.
-                    - wolfram_kernel_path: absolute path for your mathematica kernel
-                    - package_directory: absolute path for the EccentricIMR package
+        Parameters:
+        
+        eccentric_model (str): Name of the eccentric quadrupolar model.
+        kwargs (dict): Optional keyword arguments including:
+            - wolfram_kernel_path (str): Absolute path for the Mathematica kernel.
+            - package_directory (str): Absolute path for the EccentricIMR package.
         """
 
         self.wf_obj = IMRHME(circular_model='NRHybSur3dq8',
@@ -170,12 +197,19 @@ class NRHybSur3dq8_gwNRHME():
 
     def generate_waveform(self, params): 
         """
-        user-friendly function to generate combined eccentric waveform
-        params: dictionary with keys "q", "e0", "l0", "x0"
-                - q: mass ratio
-                - e0: initial eccentricity at x0
-                - l0: initial mean anomaly at x0
-                - x0: initial dimensionless orbital frequency
+        Generates a combined eccentric waveform.
+
+        Parameters:
+            params (dict): Dictionary containing waveform parameters with the following keys:
+                - q (float): Mass ratio of the binary system.
+                - e0 (float): Initial eccentricity at x0.
+                - l0 (float): Initial mean anomaly at x0.
+                - x0 (float): Initial dimensionless orbital frequency.
+
+        Returns:
+            tuple: A tuple containing:
+                - tNRE (numpy.ndarray): Time array for the generated eccentric waveform.
+                - hNRE (numpy.ndarray): Generated eccentric waveform data.
         """
         # waveform
         tNRE, hNRE = self.wf_obj.generate_waveform(params)
@@ -189,12 +223,13 @@ class BHPTNRSur1dq1e4_gwNRHME():
     """
     def __init__(self, eccentric_model, **kwargs):
         """
-        eccentric_model: name of the eccentric quadrupolar model
-        kwargs: all details about circular and eccentric models 
-                e.g.
-                     - wolfram_kernel_path: absolute path for your mathematica kernel
-                     - package_directory: absolute path for the EccentricIMR package
-                     - model_obj: a model object for BHPTNRSur1dq1e4 model
+        Parameters:
+        
+        eccentric_model (str): Name of the eccentric quadrupolar model.
+        kwargs (dict): Optional keyword arguments including:
+            - wolfram_kernel_path (str): Absolute path for the Mathematica kernel.
+            - package_directory (str): Absolute path for the EccentricIMR package.
+            - model_obj (object): A model object for BHPTNRSur1dq1e4 model.
         """
 
         self.wf_obj = IMRHME(circular_model='BHPTNRSur1dq1e4', 
@@ -203,12 +238,19 @@ class BHPTNRSur1dq1e4_gwNRHME():
 
     def generate_waveform(self, params): 
         """
-        user-friendly function to generate combined eccentric waveform
-        params: dictionary with keys "q", "e0", "l0", "x0"
-                - q: mass ratio
-                - e0: initial eccentricity at x0
-                - l0: initial mean anomaly at x0
-                - x0: initial dimensionless orbital frequency
+        Generates a combined eccentric waveform.
+
+        Parameters:
+            params (dict): Dictionary containing waveform parameters with the following keys:
+                - q (float): Mass ratio of the binary system.
+                - e0 (float): Initial eccentricity at x0.
+                - l0 (float): Initial mean anomaly at x0.
+                - x0 (float): Initial dimensionless orbital frequency.
+
+        Returns:
+            tuple: A tuple containing:
+                - tNRE (numpy.ndarray): Time array for the generated eccentric waveform.
+                - hNRE (numpy.ndarray): Generated eccentric waveform data.
         """
         # waveform
         tNRE, hNRE = self.wf_obj.generate_waveform(params)
@@ -222,11 +264,11 @@ class IMRPhenomTHM_gwNRHME():
     """
     def __init__(self, eccentric_model, **kwargs):
         """
-        eccentric_model: name of the eccentric quadrupolar model
-        kwargs: all details about circular and eccentric models 
-                e.g.
-                     - wolfram_kernel_path: absolute path for your mathematica kernel
-                     - package_directory: absolute path for the EccentricIMR package
+        Parameters:
+        eccentric_model (str): Name of the eccentric quadrupolar model.
+        kwargs (dict): Optional keyword arguments including:
+            - wolfram_kernel_path (str): Absolute path for the Mathematica kernel.
+            - package_directory (str): Absolute path for the EccentricIMR package.
         """
 
         self.wf_obj = IMRHME(circular_model='IMRPhenomTHM',
@@ -235,12 +277,19 @@ class IMRPhenomTHM_gwNRHME():
 
     def generate_waveform(self, params): 
         """
-        user-friendly function to generate combined eccentric waveform
-        params: dictionary with keys "q", "e0", "l0", "x0"
-                q: mass ratio
-                e0: initial eccentricity at x0
-                l0: initial mean anomaly at x0
-                x0: initial dimensionless orbital frequency
+        Generates a combined eccentric waveform.
+
+        Parameters:
+            params (dict): Dictionary containing waveform parameters with the following keys:
+                - q (float): Mass ratio of the binary system.
+                - e0 (float): Initial eccentricity at x0.
+                - l0 (float): Initial mean anomaly at x0.
+                - x0 (float): Initial dimensionless orbital frequency.
+
+        Returns:
+            tuple: A tuple containing:
+                - tNRE (numpy.ndarray): Time array for the generated eccentric waveform.
+                - hNRE (numpy.ndarray): Generated eccentric waveform data.
         """
         # waveform
         tNRE, hNRE = self.wf_obj.generate_waveform(params)
