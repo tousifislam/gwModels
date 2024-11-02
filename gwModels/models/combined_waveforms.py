@@ -4,24 +4,20 @@
 #
 #    FILE: combined_waveforms.py
 #
-#        AUTHOR: Tousif Islam
-#       CREATED: 07-03-2024
-# LAST MODIFIED: Tue Feb  6 17:58:52 2024
-#      REVISION: ---
+#    AUTHOR: Tousif Islam
+#    CREATED: 07-03-2024
+#    LAST MODIFIED: Tue Feb  6 17:58:52 2024
+#    REVISION: ---
 #==============================================================================
+__author__ = "Tousif Islam"
 
+import sys, os
 import warnings
 warnings.filterwarnings("ignore", "Wswiglal-redir-stdio")
 import matplotlib.pyplot as plt
 import numpy as np
-
-# import gwModels
-import sys
-sys.path.append("/home/tousifislam/Documents/works/gwModels/")
-import gwModels
 import gwsurrogate
-from gwModels.eccentric import *
-from gwModels.lal_models import *
+from ..core.gwnrhme import NRHME
 
 import gwsurrogate
 sur = gwsurrogate.LoadSurrogate('NRHybSur3dq8')
@@ -157,7 +153,7 @@ class IMRHME(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
                 self.model = model
             
         # instantiate the EccentricIMR class - it may take some time
-        self.wf = gwModels.EccentricIMR(self.wolfram_kernel_path, self.package_directory)
+        self.wf = EccentricIMR(self.wolfram_kernel_path, self.package_directory)
         
 
     def generate_waveform(self, params): 
