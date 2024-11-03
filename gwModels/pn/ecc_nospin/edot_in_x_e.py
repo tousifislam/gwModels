@@ -52,8 +52,8 @@ def F_e(e):
     Returns:
         float: The computed value of F_e(e).
     """
-    if not (0 <= e < 1):
-        raise ValueError("e must be in the range [0, 1).")
+    #if not (0 <= e < 1):
+    #    raise ValueError("e must be in the range [0, 1).")
     
     numerator = (1 + (2782 / 769) * e**2 + (10721 / 6152) * e**4 + (1719 / 24608) * e**6)
     denominator = (1 - e**2)**(11 / 2)
