@@ -172,7 +172,49 @@ class axmodel:
         plt.plot(self.t, self.e_t)
         plt.xlabel('$t$')
         plt.ylabel('$e(t)$')
+        plt.tight_layout()
         plt.show()
+
+    def plot_adiabatic_evolution(self):
+        """
+        Plot the adiabatic evolution of x and e
+        """
+        plt.figure(figsize=(12,4))
+        plt.subplot(121)
+        plt.plot(self.t, self.x_t)
+        plt.xlabel('$t$')
+        plt.ylabel('$x(t)$')
+        plt.subplot(122)
+        plt.plot(self.t, self.e_t)
+        plt.xlabel('$t$')
+        plt.ylabel('$e(t)$')
+        plt.tight_layout()
+        plt.show()
+    
+    def plot_coordinate_evolution(self):
+        """
+        Plot the coordinates r, rdot, phi, phidot
+        """
+        plt.figure(figsize=(12,8))
+        plt.subplot(221)
+        plt.plot(self.t, self.r_t)
+        plt.xlabel('$t$')
+        plt.ylabel('$r(t)$')
+        plt.subplot(222)
+        plt.plot(self.t, self.rdot_t)
+        plt.xlabel('$t$')
+        plt.ylabel('$\\dot{r}(t)$')
+        plt.subplot(223)
+        plt.plot(self.t, self.phi_t)
+        plt.xlabel('$t$')
+        plt.ylabel('$\\phi(t)$')
+        plt.subplot(224)
+        plt.plot(self.t, self.phidot_t)
+        plt.xlabel('$t$')
+        plt.ylabel('$\\dot{\\phi}(t)$')
+        plt.tight_layout()
+        plt.show()
+        
         
         
 class EccentricIMRWave:
