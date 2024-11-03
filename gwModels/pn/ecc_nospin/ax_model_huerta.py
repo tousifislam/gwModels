@@ -2,7 +2,7 @@
 #-*- coding: utf-8 -*-
 #==============================================================================
 #
-#    FILE: x_model_hinder.py
+#    FILE: ax_model_enigma.py
 #
 #    AUTHOR: Tousif Islam
 #    CREATED: 11-02-2024
@@ -41,12 +41,12 @@ from .quadrupole import *
 
 from ...utils import mass_ratio_to_symmetric_mass_ratio
 
-class xmodel:
+class axmodel:
     """
-    Employs Eccentric PN model as described in Hinder+ 2008 (https://arxiv.org/pdf/0806.1037)
+    Employs Eccentric PN model as described in Huerta+ 2016 (https://arxiv.org/pdf/1609.05933)
 
-    x-model
-    - 2PN adiabatic evolution of x and e 
+    ax-model
+    - 3PN adiabatic evolution of x and e 
     - 3PN conservative dynamics for l, phi, phidot, r, rdot
     """
     def __init__(self, q, x0, e0, t0, phi0=0.0, l0=0.0, dt=0.1, adiabatic_integration_type='euler'):
@@ -78,11 +78,11 @@ class xmodel:
     def pnw_scheme(self):
         """
         Run the full sequence of pn waveform calculations.
-        Eq 5 to Eq 15 of https://arxiv.org/pdf/0806.1037
+        https://arxiv.org/pdf/1609.05933
         """
         # Step 1: Integrate xdot and edot using Euler method
-        include_x_terms = ['0.0', '1.0', '1.5HT', '2.0']
-        include_e_terms = ['0.0', '1.0', '1.5HT', '2.0']
+        include_x_terms = None
+        include_e_terms = None
         if self.adiabatic_integration_type == 'euler':
             self.x_t, self.e_t, self.t = adiabatic_x_e_evolution(self.e0, self.x0, self.t0, self.dt, self.q, include_x_terms, include_e_terms)
         elif self.adiabatic_integration_type == 'scipy-odeint':
@@ -175,12 +175,11 @@ class xmodel:
         plt.show()
         
         
-class EccentricIMRHinder2017:
+class EccentricIMRWave:
     """
     PN-NR Hybrid waveform model for eccentric non-spinning binaries;
-    Developed in https://arxiv.org/pdf/1709.02007
-    This is a Python Implementation of the original mathematica package 
-    [ https://github.com/ianhinder/EccentricIMR/ ]
+    Developed in https://arxiv.org/pdf/1609.05933
+    This is a Python Implementation of ax-model + ENIGMA
     
     With only two exceptions: 
         (i) they use a custom merger ringdown model - we replaced it with NRHybSur3dq8
@@ -216,7 +215,7 @@ class EccentricIMRHinder2017:
         self.x_blend = x_blend
 
         # Instantiate the inspiral waveform
-        self.wf = xmodel(q=self.q, x0=self.x0, e0=self.e0, t0=self.t0, l0=self.l0, phi0=self.phi0, dt=self.dt)
+        self.wf = axmodel(q=self.q, x0=self.x0, e0=self.e0, t0=self.t0, l0=self.l0, phi0=self.phi0, dt=self.dt)
 
         # Interpolation objects for waveform quantities
         self.spl_x_to_t = splrep(self.wf.x_t, self.wf.t)
