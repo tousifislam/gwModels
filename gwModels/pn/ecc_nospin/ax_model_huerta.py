@@ -2,7 +2,7 @@
 #-*- coding: utf-8 -*-
 #==============================================================================
 #
-#    FILE: ax_model_enigma.py
+#    FILE: ax_model_huerta.py
 #
 #    AUTHOR: Tousif Islam
 #    CREATED: 11-02-2024
