@@ -1,0 +1,17 @@
+gsl
+numpy
+scipy
+swig
+h5py
+matplotlib
+lalsuite
+astropy
+gwpy
+pandas
+numba
+multiprocess
+libconfig
+python-dotenv
+gwtools
+gwsurrogate
+wolframclient
