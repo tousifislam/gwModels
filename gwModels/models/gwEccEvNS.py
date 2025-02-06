@@ -2,7 +2,7 @@
 #-*- coding: utf-8 -*-
 #==============================================================================
 #
-#    FILE: circular_models.py
+#    FILE: gwEccEvNS.py
 #
 #    AUTHOR: Tousif Islam
 #    CREATED: 11-01-2024
