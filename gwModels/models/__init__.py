@@ -1,3 +1,4 @@
+from .gwEccEvNS import *
 from .circular_models import *
 from .lal_models import *
 
