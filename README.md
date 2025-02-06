@@ -106,8 +106,17 @@ If you make use of the gwModels framework, please cite the following papers:
 }
 ```
 
-
-
+```
+@article{Islam:2025oiv,
+    author = "Islam, Tousif and Venumadhav, Tejaswi",
+    title = "{Post-Newtonian theory-inspired framework for characterizing eccentricity in gravitational waveforms}",
+    eprint = "2502.02739",
+    archivePrefix = "arXiv",
+    primaryClass = "gr-qc",
+    month = "2",
+    year = "2025"
+}
+```
 
 
 
