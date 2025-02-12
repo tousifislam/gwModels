@@ -15,7 +15,7 @@ requirements = [
 ]
 
 setup(name='gwModels',
-      version='0.0.7',
+      version='0.0.8',
       author='Tousif Islam',
       author_email='tousifislam24@gmail.com',
       license='MIT',

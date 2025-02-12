@@ -10,9 +10,13 @@ gwModels.egg-info/top_level.txt
 gwModels/core/__init__.py
 gwModels/core/gwnrhme.py
 gwModels/core/gwnrxhme.py
+gwModels/ecc_measures/__init__.py
+gwModels/ecc_measures/compute_ecc_omega_ecc_gw.py
+gwModels/ecc_measures/compute_ecc_xi.py
 gwModels/models/__init__.py
 gwModels/models/circular_models.py
 gwModels/models/eccentricimr_wolfram.py
+gwModels/models/gwEccEvNS.py
 gwModels/models/gwnrhme_models.py
 gwModels/models/lal_models.py
 gwModels/utils/__init__.py
