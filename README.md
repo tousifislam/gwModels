@@ -39,6 +39,14 @@ It has two variants based on the constituent circular model. These variants are 
 
 Example use is here: https://github.com/tousifislam/gwModels/blob/main/tutorials/
 
+#### 4. Estimating eccentricity with gwModels using PN-inspired fits 
+It calculate $e_{\\xi}$, $e_{\\omega}$ and $e_{\\rm gw}$ following Islam and Venumadav (https://arxiv.org/abs/2502.02739)
+Example notebook: https://github.com/tousifislam/gwModels/blob/main/tutorials/gwModels_eccentricity_estimation.ipynb
+
+##### 4.1. gwEccEvNS
+A fast approximate eccentricity evolution model for non-spinning binaries based on SXS NR simulations provided by Islam and Venumadav (https://arxiv.org/abs/2502.02739)
+Example notebook: https://github.com/tousifislam/gwModels/blob/main/tutorials/gwEccEvNS.ipynb
+
 # Requirements
 This package requires Python 3, and gwtools.
 
