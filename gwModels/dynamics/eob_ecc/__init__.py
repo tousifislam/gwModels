@@ -4,10 +4,10 @@ from .nonprec_secular_resum import (
     zetadot_func,
     integrate_eob_eccentric_dynamics,
 )
-from .nonprec_postadiabatic import (
+from .nonprec_postadiabatic_resum import (
     pa_correction_x,
     pa_correction_e,
     pa_correction_zeta,
     apply_pa_corrections,
 )
-from .nonprec import evolve_eccentric_nonprec
+from .nonprec_resum import evolve_eccentric_nonprec

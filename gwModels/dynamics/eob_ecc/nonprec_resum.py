@@ -18,7 +18,7 @@ import logging
 import numpy as np
 
 from .nonprec_secular_resum import integrate_eob_eccentric_dynamics
-from .nonprec_postadiabatic import apply_pa_corrections
+from .nonprec_postadiabatic_resum import apply_pa_corrections
 
 logger = logging.getLogger(__name__)
 
