@@ -14,7 +14,8 @@ import numpy as np
 import gwtools
 import scipy
 from ..utils.alignment import AlignWFData
-from ..utils.features import get_frequency, get_peak, phase_align_dict, check_pi_rotation
+from ..utils.features import get_frequency
+from ..utils.alignment import get_peak, phase_align_dict, check_pi_rotation
 
 
 class BaseEccentricHM:
