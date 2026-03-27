@@ -11,3 +11,9 @@ from .nonprec_postadiabatic_resum import (
     apply_pa_corrections,
 )
 from .nonprec_resum import evolve_eccentric_nonprec
+from .nonprec_secular_nonresum import (
+    edot_nonresum,
+    xdot_nonresum,
+    integrate_eob_eccentric_dynamics_nonresum,
+)
+from .nonprec_nonresum import evolve_eccentric_nonprec_nonresum
