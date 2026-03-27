@@ -1,96 +1,18 @@
 """
-Non-precessing (aligned-spin) eccentric orbital dynamics at 3PN order.
-
-Implements the NON-RESUMMED 3PN evolution ODEs for (e, x, zeta)
-from Gamboa, Khalil & Buonanno (SEOBNRv5EHM supplementary data),
-including all spin-orbit (SO) and spin-spin (SS) terms.
-
-The non-resummed expressions differ from the resummed ones at 1.5PN tail,
-2.5PN tail, and 3PN orders.  The 3PN block has eccentricity powers up to
-e^18 (much higher than the resummed e^8) with large polynomial coefficients
-involving EulerGamma, Log[2], Log[3], Log[5].
-
-Spin variables:
-    chi_S = (chi1 + chi2) / 2      symmetric spin combination
-    chi_A = (chi1 - chi2) / 2      antisymmetric spin combination
-    delta = (m1 - m2) / M          mass difference ratio = sqrt(1 - 4*nu)
-    kappa_S, kappa_A               tidal deformability combinations
-                                   (= 0 for BBH since kappa1 = kappa2 = 1)
-
-Gauge: alpha = -16/3, beta = -13/2.
-epsilon = 1 (PN counting parameter) throughout.
-SO = 1 (spin order counting parameter) throughout.
-
-References:
-    EOB_fluxes.dat.m (edot      lines 2667-2839,
-                      xdot      lines 2984-3107,
-                      zetadot   lines 3226-3304)
+Non-resummed 3PN evolution ODEs for aligned-spin eccentric binaries.
+Numba JIT-compiled for performance.
 """
 
-import logging
-import numpy as np
-from scipy.integrate import solve_ivp
-
-# Import zetadot from the resummed module (same expression)
-from gwModels.dynamics.eob_ecc.nonprec_secular_resum import zetadot_func
-
-logger = logging.getLogger(__name__)
-
-# Physical constants
-EULER_GAMMA = np.euler_gamma  # 0.5772156649...
-LOG2 = np.log(2)
-LOG3 = np.log(3)
-LOG5 = np.log(5)
-PI = np.pi
+import math
+from numba import njit
+from ._common import (
+    EULER_GAMMA, LOG2, LOG3, LOG5, PI,
+    _zetadot_numba, integrate_dynamics,
+)
 
 
-def _get_delta(nu, delta):
-    """Compute delta = sqrt(1 - 4*nu) if not provided."""
-    if delta is None:
-        arg = 1.0 - 4.0 * nu
-        if arg < 0:
-            arg = 0.0
-        return np.sqrt(arg)
-    return delta
-
-
-# ============================================================================
-# de/dt  --  non-resummed (aligned-spin)
-# Source: EOB_fluxes.dat.m lines 2667-2839
-# ============================================================================
-
-def edot_nonresum(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
-                  kappa_S=0.0, kappa_A=0.0):
-    """
-    Non-resummed de/dt for aligned-spin eccentric binaries at 3PN order.
-
-    Parameters
-    ----------
-    e : float
-        Keplerian eccentricity.
-    x : float
-        PN frequency parameter x = (M*Omega)^(2/3).
-    nu : float
-        Symmetric mass ratio nu = m1*m2/(m1+m2)^2.
-    chi_S : float
-        Symmetric spin combination (chi1 + chi2) / 2.
-    chi_A : float
-        Antisymmetric spin combination (chi1 - chi2) / 2.
-    delta : float or None
-        Mass difference ratio (m1 - m2) / M.  If None, computed as
-        sqrt(1 - 4*nu).
-    kappa_S : float
-        Symmetric tidal parameter (0 for BBH).
-    kappa_A : float
-        Antisymmetric tidal parameter (0 for BBH).
-
-    Returns
-    -------
-    float
-        Time derivative de/dt in geometric units (G = c = 1, M = 1).
-    """
-    delta = _get_delta(nu, delta)
-
+@njit(cache=True, fastmath=True)
+def _edot_numba(e, x, nu, chi_S, chi_A, delta, kappa_S, kappa_A):
     e2 = e * e
     e4 = e2 * e2
     e6 = e4 * e2
@@ -103,8 +25,8 @@ def edot_nonresum(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
     nu2 = nu * nu
     nu3 = nu2 * nu
     oome2 = 1.0 - e2           # 1 - e^2
-    sqrt_oome2 = np.sqrt(oome2)
-    sqrt_x = np.sqrt(x)
+    sqrt_oome2 = math.sqrt(oome2)
+    sqrt_x = math.sqrt(x)
 
     chiA2 = chi_A * chi_A
     chiS2 = chi_S * chi_S
@@ -174,7 +96,6 @@ def edot_nonresum(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
 
     # ------------------------------------------------------------------
     # 1.5PN SO: x^(3/2) * (...) / (90*(1-e^2)^4)
-    #   Lines 2687-2690
     # ------------------------------------------------------------------
     so_15pn_num = ((-16232.0 - 248.0 * e2 + 1869.0 * e4) * delta * chi_A
                    + (-3.0 * e4 * (-623.0 + 92.0 * nu)
@@ -186,7 +107,6 @@ def edot_nonresum(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
     # 2.5PN SO tail:
     #   -Pi*x^3 * (2*Sqrt[1-e^2]*(...) - (-1+e^2)*(...))
     #   / (2160*(1-e^2)^(3/2)*(1+Sqrt[1-e^2]))
-    #   Lines 2691-2703
     # ------------------------------------------------------------------
     # sqrt(1-e^2) block
     so_25pn_tail_sqrt_chiA = ((1125696.0 + 6578040.0 * e2
@@ -224,7 +144,6 @@ def edot_nonresum(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
 
     # ------------------------------------------------------------------
     # 2.5PN SO (non-tail): -x^(5/2) * (...) / (60480*(1-e^2)^5*(1+sqrt(1-e^2)))
-    #   Lines 2703-2718
     # ------------------------------------------------------------------
     # Main block (no sqrt(1-e^2))
     so_25pn_main_chiA = (delta * (20822976.0
@@ -268,7 +187,6 @@ def edot_nonresum(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
 
     # ------------------------------------------------------------------
     # 2PN SS: x^2 * (...) / (120*(1-e^2)^(9/2))
-    #   Lines 2719-2727
     # ------------------------------------------------------------------
     ss_2pn_num = (
         -8.0 * (1684.0 + 1814.0 * e2 + 143.0 * e4)
@@ -287,7 +205,6 @@ def edot_nonresum(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
 
     # ------------------------------------------------------------------
     # 3PN SS: x^3 * (...) / (60480*(1-e^2)^(11/2)*(1+sqrt(1-e^2)))
-    #   Lines 2727-2771
     # ------------------------------------------------------------------
     # Main block (no sqrt(1-e^2) factor)
     ss_3pn_kS = (6.0 * kappa_S * (
@@ -363,11 +280,10 @@ def edot_nonresum(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
 
     # ------------------------------------------------------------------
     # 3PN (non-spin): -x^3 * (...) / (8382528000*(1-e^2)^(11/2)*(1+sqrt(1-e^2)))
-    #   Lines 2772-2839
     # ------------------------------------------------------------------
-    log_x = np.log(x)
+    log_x = math.log(x)
     log_arg_inner = (1.0 + sqrt_oome2) * x / (2.0 * oome2)
-    log_inner = np.log(log_arg_inner)
+    log_inner = math.log(log_arg_inner)
 
     # Eccentricity polynomial for EulerGamma and Log/Pi^2 terms
     eg_poly = (24608.0 + 89024.0 * e2 + 42884.0 * e4 + 1719.0 * e6)
@@ -524,42 +440,8 @@ def edot_nonresum(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
     return -e * x**4 * nu * bracket
 
 
-# ============================================================================
-# dx/dt  --  non-resummed (aligned-spin)
-# Source: EOB_fluxes.dat.m lines 2984-3107
-# ============================================================================
-
-def xdot_nonresum(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
-                  kappa_S=0.0, kappa_A=0.0):
-    """
-    Non-resummed dx/dt for aligned-spin eccentric binaries at 3PN order.
-
-    Parameters
-    ----------
-    e : float
-        Keplerian eccentricity.
-    x : float
-        PN frequency parameter.
-    nu : float
-        Symmetric mass ratio.
-    chi_S : float
-        Symmetric spin combination.
-    chi_A : float
-        Antisymmetric spin combination.
-    delta : float or None
-        Mass difference ratio.
-    kappa_S : float
-        Symmetric tidal parameter (0 for BBH).
-    kappa_A : float
-        Antisymmetric tidal parameter (0 for BBH).
-
-    Returns
-    -------
-    float
-        Time derivative dx/dt.
-    """
-    delta = _get_delta(nu, delta)
-
+@njit(cache=True, fastmath=True)
+def _xdot_numba(e, x, nu, chi_S, chi_A, delta, kappa_S, kappa_A):
     e2 = e * e
     e4 = e2 * e2
     e6 = e4 * e2
@@ -572,8 +454,8 @@ def xdot_nonresum(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
     nu2 = nu * nu
     nu3 = nu2 * nu
     oome2 = 1.0 - e2
-    sqrt_oome2 = np.sqrt(oome2)
-    sqrt_x = np.sqrt(x)
+    sqrt_oome2 = math.sqrt(oome2)
+    sqrt_x = math.sqrt(x)
 
     chiA2 = chi_A * chi_A
     chiS2 = chi_S * chi_S
@@ -625,8 +507,6 @@ def xdot_nonresum(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
     # 2.5PN tail (non-spin):
     #   Pi*x^(5/2) * (168*A + Sqrt[1-e^2]*B)
     #   / (20160*(1-e^2)^(3/2))
-    # where A = 18432 + 120384*e^2 + 347760*e^4 + 730751*e^6
-    #       B = -576*(9535+15876*nu) - 1152*e^2*(...) - ... + e^8*(...)
     # ------------------------------------------------------------------
     tail25_A = (18432.0 + 120384.0 * e2 + 347760.0 * e4
                 + 730751.0 * e6)
@@ -701,7 +581,6 @@ def xdot_nonresum(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
     #   Pi*x^3 * (2*A*delta*chiA + 2*(-1+e^2)*B*chiS
     #             + Sqrt[1-e^2]*(-6*C*delta*chiA + D*chiS))
     #   / (720*(1-e^2)^(5/2))
-    #   Lines 3024-3034
     # ------------------------------------------------------------------
     so_25pn_tail_A = (-73728.0 + 522048.0 * e2 + 6454080.0 * e4
                       + 24159089.0 * e6 - 86903312.0 * e8
@@ -731,7 +610,7 @@ def xdot_nonresum(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
 
     # ------------------------------------------------------------------
     # 3PN SS: -x^3 * (...) / (20160*(1-e^2)^(13/2))
-    #   Same as resummed  (lines 3035-3064)
+    #   Same as resummed
     # ------------------------------------------------------------------
     # kappa terms
     ss_3pn_kappa = (
@@ -798,12 +677,11 @@ def xdot_nonresum(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
 
     # ------------------------------------------------------------------
     # 3PN (non-spin): -x^3 * (...) / (2794176000*(1-e^2)^(13/2))
-    #   Lines 3065-3107
     #   Structure: -x^3 * (1584*sqrt(1-e^2)*S + 7*M) / denom
     # ------------------------------------------------------------------
-    log_x = np.log(x)
+    log_x = math.log(x)
     log_arg_inner = (1.0 + sqrt_oome2) * x / (2.0 * oome2)
-    log_inner = np.log(log_arg_inner)
+    log_inner = math.log(log_arg_inner)
 
     # Eccentricity polynomial for Log[x] and Log[...] terms
     xlog_poly = (3072.0 + 43520.0 * e2 + 82736.0 * e4
@@ -921,252 +799,58 @@ def xdot_nonresum(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
     return prefactor * bracket
 
 
-# ============================================================================
-# ODE system and integrator
-# ============================================================================
+def edot(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
+         kappa_S=0.0, kappa_A=0.0):
+    """Public wrapper for non-resummed de/dt."""
+    if delta is None:
+        arg = 1.0 - 4.0 * nu
+        delta = math.sqrt(max(arg, 0.0))
+    return _edot_numba(e, x, nu, chi_S, chi_A, delta, kappa_S, kappa_A)
+
+
+def xdot(e, x, nu, chi_S=0.0, chi_A=0.0, delta=None,
+         kappa_S=0.0, kappa_A=0.0):
+    """Public wrapper for non-resummed dx/dt."""
+    if delta is None:
+        arg = 1.0 - 4.0 * nu
+        delta = math.sqrt(max(arg, 0.0))
+    return _xdot_numba(e, x, nu, chi_S, chi_A, delta, kappa_S, kappa_A)
+
+
+@njit(cache=True, fastmath=True)
+def rhs_inner(e_val, x_val, zeta_val, nu, chi_S, chi_A,
+              delta, kappa_S, kappa_A):
+    """Pure numba RHS returning (de, dx, dz) as a tuple."""
+    if e_val < 0.0 or x_val <= 0.0 or x_val > 1.0 or e_val >= 1.0:
+        return (0.0, 0.0, 0.0)
+    de = _edot_numba(e_val, x_val, nu, chi_S, chi_A, delta,
+                     kappa_S, kappa_A)
+    dx = _xdot_numba(e_val, x_val, nu, chi_S, chi_A, delta,
+                     kappa_S, kappa_A)
+    dz = _zetadot_numba(e_val, x_val, zeta_val, nu, chi_S, chi_A,
+                        delta, kappa_S, kappa_A)
+    return (de, dx, dz)
+
 
 def _rhs(t, y, nu, chi_S, chi_A, delta, kappa_S, kappa_A):
-    """ODE right-hand side: dy/dt = [de/dt, dx/dt, dzeta/dt]."""
-    e_val, x_val, zeta_val = y
-    if e_val < 0 or x_val <= 0 or x_val > 1.0 or e_val >= 1.0:
-        return [0.0, 0.0, 0.0]
-    de = edot_nonresum(e_val, x_val, nu, chi_S, chi_A, delta,
-                       kappa_S, kappa_A)
-    dx = xdot_nonresum(e_val, x_val, nu, chi_S, chi_A, delta,
-                       kappa_S, kappa_A)
-    dz = zetadot_func(e_val, x_val, zeta_val, nu, chi_S, chi_A, delta,
-                      kappa_S, kappa_A)
+    """ODE RHS compatible with solve_ivp."""
+    de, dx, dz = rhs_inner(y[0], y[1], y[2], nu, chi_S, chi_A,
+                           delta, kappa_S, kappa_A)
     return [de, dx, dz]
 
 
-def _event_x_large(t, y, nu, chi_S, chi_A, delta, kappa_S, kappa_A):
-    """Terminate when x > 0.5 (PN breakdown)."""
-    return 0.5 - y[1]
-
-_event_x_large.terminal = True
-_event_x_large.direction = -1
-
-
-def _event_e_negative(t, y, nu, chi_S, chi_A, delta, kappa_S, kappa_A):
-    """Terminate when e < 1e-10."""
-    return y[0] - 1e-10
-
-_event_e_negative.terminal = True
-_event_e_negative.direction = -1
+def integrate_eob_eccentric_dynamics(q, chi1=0.0, chi2=0.0, e0=0.1,
+                                     zeta0=0.0, t_eval=None,
+                                     omega0=0.0085, t_end=None,
+                                     rtol=1e-10, atol=1e-12,
+                                     kappa1=1.0, kappa2=1.0,
+                                     x_stop=None):
+    """Integrate eccentric dynamics using non-resummed 3PN fluxes (numba)."""
+    return integrate_dynamics(
+        _rhs, rhs_inner, q, chi1, chi2, e0, zeta0, t_eval,
+        omega0, t_end, rtol, atol, kappa1, kappa2, x_stop)
 
 
-def _event_oome2_small(t, y, nu, chi_S, chi_A, delta, kappa_S, kappa_A):
-    """Terminate when 1-e^2 < 0.01."""
-    return (1.0 - y[0]**2) - 0.01
-
-_event_oome2_small.terminal = True
-_event_oome2_small.direction = -1
-
-
-def integrate_eob_eccentric_dynamics_nonresum(q, chi1=0.0, chi2=0.0, e0=0.1,
-                                              zeta0=0.0, t_eval=None,
-                                              omega0=0.0085, t_end=None,
-                                              rtol=1e-10, atol=1e-12,
-                                              kappa1=1.0, kappa2=1.0,
-                                              x_stop=None):
-    """
-    Integrate aligned-spin eccentric dynamics ODEs at 3PN order
-    using non-resummed fluxes.
-
-    Parameters
-    ----------
-    q : float
-        Mass ratio q = m1/m2 >= 1.
-    chi1 : float
-        Dimensionless spin of the heavier body (aligned with L).
-    chi2 : float
-        Dimensionless spin of the lighter body (aligned with L).
-    e0 : float
-        Initial Keplerian eccentricity.
-    zeta0 : float
-        Initial relativistic anomaly.
-    t_eval : array-like, optional
-        Times at which to store solution. If None, solver chooses.
-    omega0 : float
-        Initial orbit-averaged orbital frequency (default 0.0085).
-    t_end : float, optional
-        End time. If None, estimated from circular inspiral time.
-    rtol, atol : float
-        Solver tolerances.
-    kappa1, kappa2 : float
-        Spin-induced quadrupole parameters (= 1 for black holes).
-    x_stop : float or str, optional
-        Stopping value for x. Options:
-        - None: stop at x=0.5 (default, PN breakdown)
-        - 'isco': compute x_ISCO from Kerr ISCO and stop there
-        - float: stop at this specific x value
-
-    Returns
-    -------
-    dict with keys:
-        t : array, time
-        e : array, eccentricity
-        x : array, PN parameter
-        zeta : array, relativistic anomaly
-        x_isco : float, estimated x at ISCO
-        success : bool
-        message : str
-        sol : OdeResult
-    """
-    # Import ISCO computation from resummed module
-    from .nonprec_secular_resum import _compute_x_isco
-
-    nu = q / (1.0 + q)**2
-    delta_val = (q - 1.0) / (q + 1.0)
-
-    chi_S = 0.5 * (chi1 + chi2)
-    chi_A = 0.5 * (chi1 - chi2)
-
-    kappa_S_val = 0.5 * (kappa1 + kappa2) - 1.0
-    kappa_A_val = 0.5 * (kappa1 - kappa2)
-
-    # Compute x_ISCO
-    x_isco = _compute_x_isco(chi1, chi2, q)
-
-    # Resolve x_stop
-    if x_stop == 'isco':
-        x_stop_val = x_isco
-    elif x_stop is not None:
-        x_stop_val = float(x_stop)
-    else:
-        x_stop_val = 0.5
-
-    def _event_x_stop(t, y, nu, chi_S, chi_A, delta, kappa_S, kappa_A):
-        return x_stop_val - y[1]
-    _event_x_stop.terminal = True
-    _event_x_stop.direction = -1
-
-    x0 = omega0**(2.0 / 3.0)
-
-    if t_end is None:
-        t_merge_est = 5.0 / (256.0 * nu * x0**4)
-        t_end = 1.05 * t_merge_est
-
-    t_span = (0.0, t_end)
-    y0 = [e0, x0, zeta0]
-
-    logger.info("Integrating EOB eccentric dynamics (non-resummed): "
-                "q=%.4f, chi1=%.4f, chi2=%.4f, e0=%.4f, x0=%.6f, "
-                "x_stop=%.4f, x_isco=%.4f",
-                q, chi1, chi2, e0, x0, x_stop_val, x_isco)
-
-    sol = solve_ivp(
-        _rhs, t_span, y0,
-        args=(nu, chi_S, chi_A, delta_val, kappa_S_val, kappa_A_val),
-        method='DOP853',
-        rtol=rtol,
-        atol=atol,
-        t_eval=t_eval,
-        dense_output=True,
-        events=[_event_x_stop, _event_e_negative, _event_oome2_small],
-        max_step=2.0 * PI / (10.0 * omega0),
-    )
-
-    logger.info("Integration finished: success=%s, message=%s",
-                sol.success, sol.message)
-
-    return {
-        't': sol.t,
-        'e': sol.y[0],
-        'x': sol.y[1],
-        'zeta': sol.y[2],
-        'x_isco': x_isco,
-        'success': sol.success,
-        'message': sol.message,
-        'sol': sol,
-    }
-
-
-# ============================================================================
-# Sanity checks
-# ============================================================================
-
-def sanity_check():
-    """Run basic sanity checks on the non-resummed evolution equations."""
-    logger.info("Running sanity checks (non-resummed)...")
-
-    nu = 0.25  # equal mass
-    x = 0.01   # low frequency
-
-    # ------------------------------------------------------------------
-    # Check 1: edot(e=0) should be 0 (prefactor is proportional to e)
-    # ------------------------------------------------------------------
-    de = edot_nonresum(0.0, x, nu)
-    assert abs(de) < 1e-30, f"edot(e=0) = {de}, expected 0"
-    logger.info("  [PASS] edot(e=0, x=%s, nu=%s) = %.2e", x, nu, de)
-
-    # ------------------------------------------------------------------
-    # Check 2: xdot(e=0) at 0PN should be 64*nu*x^5/5
-    # ------------------------------------------------------------------
-    dx_full = xdot_nonresum(0.0, x, nu)
-    dx_0pn = 64.0 * nu * x**5 / 5.0
-    rel_err = abs(dx_full - dx_0pn) / abs(dx_0pn)
-    assert rel_err < 0.05, (
-        f"xdot(e=0) = {dx_full}, 0PN = {dx_0pn}, rel_err = {rel_err}")
-    logger.info("  [PASS] xdot(e=0, x=%s, nu=%s) = %.6e  "
-                "(0PN: %.6e, rel_err: %.4f)", x, nu, dx_full, dx_0pn,
-                rel_err)
-
-    # ------------------------------------------------------------------
-    # Check 3: zetadot(e=0, 0PN) ~ x^(3/2)
-    # ------------------------------------------------------------------
-    dz = zetadot_func(0.0, x, 0.0, nu)
-    dz_0pn = x**1.5
-    rel_err_z = abs(dz - dz_0pn) / abs(dz_0pn)
-    assert rel_err_z < 0.1, (
-        f"zetadot(e=0) = {dz}, 0PN = {dz_0pn}, rel_err = {rel_err_z}")
-    logger.info("  [PASS] zetadot(e=0, x=%s, nu=%s) = %.6e  "
-                "(0PN: %.6e, rel_err: %.4f)", x, nu, dz, dz_0pn,
-                rel_err_z)
-
-    # ------------------------------------------------------------------
-    # Check 4: edot should be negative (eccentricity decreases)
-    # ------------------------------------------------------------------
-    de2 = edot_nonresum(0.1, x, nu)
-    assert de2 < 0, f"edot(e=0.1) = {de2}, expected negative"
-    logger.info("  [PASS] edot(e=0.1, x=%s, nu=%s) = %.6e  (negative)", x,
-                nu, de2)
-
-    # ------------------------------------------------------------------
-    # Check 5: xdot should be positive (frequency increases)
-    # ------------------------------------------------------------------
-    dx2 = xdot_nonresum(0.1, x, nu)
-    assert dx2 > 0, f"xdot(e=0.1) = {dx2}, expected positive"
-    logger.info("  [PASS] xdot(e=0.1, x=%s, nu=%s) = %.6e  (positive)", x,
-                nu, dx2)
-
-    # ------------------------------------------------------------------
-    # Check 6: Non-spinning should match spinning with chi=0
-    # ------------------------------------------------------------------
-    de_nospin = edot_nonresum(0.3, x, nu)
-    de_spin0 = edot_nonresum(0.3, x, nu, chi_S=0.0, chi_A=0.0)
-    assert abs(de_nospin - de_spin0) < 1e-30, (
-        f"edot mismatch: nospin={de_nospin}, spin0={de_spin0}")
-    logger.info("  [PASS] edot(chi=0) matches non-spinning case")
-
-    # ------------------------------------------------------------------
-    # Check 7: Spinning case runs without error
-    # ------------------------------------------------------------------
-    nu_q3 = 3.0 / 16.0  # q=3
-    de_spin = edot_nonresum(0.1, x, nu_q3, chi_S=0.3, chi_A=0.1)
-    dx_spin = xdot_nonresum(0.1, x, nu_q3, chi_S=0.3, chi_A=0.1)
-    dz_spin = zetadot_func(0.1, x, 0.5, nu_q3, chi_S=0.3, chi_A=0.1)
-    logger.info("  [PASS] Spinning case (chi_S=0.3, chi_A=0.1): "
-                "edot=%.6e, xdot=%.6e, zetadot=%.6e",
-                de_spin, dx_spin, dz_spin)
-
-    # ------------------------------------------------------------------
-    # Check 8: Spin should modify the fluxes
-    # ------------------------------------------------------------------
-    de_nospin_q3 = edot_nonresum(0.1, x, nu_q3)
-    assert abs(de_spin - de_nospin_q3) > 1e-30, (
-        "Spin terms have no effect -- something is wrong")
-    logger.info("  [PASS] Spin terms modify edot (diff = %.6e)",
-                de_spin - de_nospin_q3)
-
-    logger.info("All sanity checks passed (non-resummed)!")
+def warmup():
+    """Trigger JIT compilation."""
+    rhs_inner(0.1, 0.01, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0)
