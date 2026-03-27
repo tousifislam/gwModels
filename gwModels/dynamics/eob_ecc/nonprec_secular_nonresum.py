@@ -967,7 +967,8 @@ def integrate_eob_eccentric_dynamics_nonresum(q, chi1=0.0, chi2=0.0, e0=0.1,
                                               zeta0=0.0, t_eval=None,
                                               omega0=0.0085, t_end=None,
                                               rtol=1e-10, atol=1e-12,
-                                              kappa1=1.0, kappa2=1.0):
+                                              kappa1=1.0, kappa2=1.0,
+                                              x_stop=None):
     """
     Integrate aligned-spin eccentric dynamics ODEs at 3PN order
     using non-resummed fluxes.
@@ -994,6 +995,11 @@ def integrate_eob_eccentric_dynamics_nonresum(q, chi1=0.0, chi2=0.0, e0=0.1,
         Solver tolerances.
     kappa1, kappa2 : float
         Spin-induced quadrupole parameters (= 1 for black holes).
+    x_stop : float or str, optional
+        Stopping value for x. Options:
+        - None: stop at x=0.5 (default, PN breakdown)
+        - 'isco': compute x_ISCO from Kerr ISCO and stop there
+        - float: stop at this specific x value
 
     Returns
     -------
@@ -1002,12 +1008,16 @@ def integrate_eob_eccentric_dynamics_nonresum(q, chi1=0.0, chi2=0.0, e0=0.1,
         e : array, eccentricity
         x : array, PN parameter
         zeta : array, relativistic anomaly
+        x_isco : float, estimated x at ISCO
         success : bool
         message : str
         sol : OdeResult
     """
+    # Import ISCO computation from resummed module
+    from .nonprec_secular_resum import _compute_x_isco
+
     nu = q / (1.0 + q)**2
-    delta_val = (q - 1.0) / (q + 1.0)  # (m1 - m2)/M with m1 >= m2
+    delta_val = (q - 1.0) / (q + 1.0)
 
     chi_S = 0.5 * (chi1 + chi2)
     chi_A = 0.5 * (chi1 - chi2)
@@ -1015,19 +1025,35 @@ def integrate_eob_eccentric_dynamics_nonresum(q, chi1=0.0, chi2=0.0, e0=0.1,
     kappa_S_val = 0.5 * (kappa1 + kappa2) - 1.0
     kappa_A_val = 0.5 * (kappa1 - kappa2)
 
+    # Compute x_ISCO
+    x_isco = _compute_x_isco(chi1, chi2, q)
+
+    # Resolve x_stop
+    if x_stop == 'isco':
+        x_stop_val = x_isco
+    elif x_stop is not None:
+        x_stop_val = float(x_stop)
+    else:
+        x_stop_val = 0.5
+
+    def _event_x_stop(t, y, nu, chi_S, chi_A, delta, kappa_S, kappa_A):
+        return x_stop_val - y[1]
+    _event_x_stop.terminal = True
+    _event_x_stop.direction = -1
+
     x0 = omega0**(2.0 / 3.0)
 
-    # Estimate inspiral time from circular 0PN: t_merge ~ 5/(256*nu*x0^4)
     if t_end is None:
         t_merge_est = 5.0 / (256.0 * nu * x0**4)
-        t_end = 1.05 * t_merge_est  # go slightly past estimated merger
+        t_end = 1.05 * t_merge_est
 
     t_span = (0.0, t_end)
     y0 = [e0, x0, zeta0]
 
     logger.info("Integrating EOB eccentric dynamics (non-resummed): "
-                "q=%.4f, chi1=%.4f, chi2=%.4f, e0=%.4f, x0=%.6f",
-                q, chi1, chi2, e0, x0)
+                "q=%.4f, chi1=%.4f, chi2=%.4f, e0=%.4f, x0=%.6f, "
+                "x_stop=%.4f, x_isco=%.4f",
+                q, chi1, chi2, e0, x0, x_stop_val, x_isco)
 
     sol = solve_ivp(
         _rhs, t_span, y0,
@@ -1037,7 +1063,7 @@ def integrate_eob_eccentric_dynamics_nonresum(q, chi1=0.0, chi2=0.0, e0=0.1,
         atol=atol,
         t_eval=t_eval,
         dense_output=True,
-        events=[_event_x_large, _event_e_negative, _event_oome2_small],
+        events=[_event_x_stop, _event_e_negative, _event_oome2_small],
         max_step=2.0 * PI / (10.0 * omega0),
     )
 
@@ -1049,6 +1075,7 @@ def integrate_eob_eccentric_dynamics_nonresum(q, chi1=0.0, chi2=0.0, e0=0.1,
         'e': sol.y[0],
         'x': sol.y[1],
         'zeta': sol.y[2],
+        'x_isco': x_isco,
         'success': sol.success,
         'message': sol.message,
         'sol': sol,

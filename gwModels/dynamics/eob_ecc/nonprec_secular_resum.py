@@ -1064,6 +1064,31 @@ def _rhs(t, y, nu, chi_S, chi_A, delta, kappa_S, kappa_A):
     return [de, dx, dz]
 
 
+def _kerr_isco_radius(a):
+    """Boyer-Lindquist ISCO radius for dimensionless spin a."""
+    a = np.clip(a, -0.9999, 0.9999)
+    Z1 = 1.0 + (1 - a**2)**(1/3.0) * ((1 + a)**(1/3.0) + (1 - a)**(1/3.0))
+    Z2 = np.sqrt(3 * a**2 + Z1**2)
+    return 3 + Z2 - np.sign(a) * np.sqrt((3 - Z1) * (3 + Z1 + 2 * Z2))
+
+
+def _compute_x_isco(chi1, chi2, q):
+    """
+    Estimate x_ISCO from the Kerr ISCO of the final BH.
+
+    Uses the leading-order effective spin to estimate the final spin,
+    then computes the ISCO frequency x = Omega_ISCO^{2/3}.
+    """
+    nu = q / (1.0 + q)**2
+    # Leading-order estimate of final spin: test-particle limit
+    a_eff = (chi1 + chi2 * q**2) / (1.0 + q)**2
+    r_isco = _kerr_isco_radius(a_eff)
+    # Kepler: Omega_ISCO = 1 / (r^{3/2} + a)
+    omega_isco = 1.0 / (r_isco**1.5 + a_eff)
+    x_isco = omega_isco**(2.0 / 3.0)
+    return x_isco
+
+
 def _event_x_large(t, y, nu, chi_S, chi_A, delta, kappa_S, kappa_A):
     """Terminate when x > 0.5 (PN breakdown)."""
     return 0.5 - y[1]
@@ -1092,7 +1117,8 @@ def integrate_eob_eccentric_dynamics(q, chi1=0.0, chi2=0.0, e0=0.1,
                                      zeta0=0.0, t_eval=None,
                                      omega0=0.0085, t_end=None,
                                      rtol=1e-10, atol=1e-12,
-                                     kappa1=1.0, kappa2=1.0):
+                                     kappa1=1.0, kappa2=1.0,
+                                     x_stop=None):
     """
     Integrate aligned-spin eccentric dynamics ODEs at 3PN order.
 
@@ -1118,6 +1144,11 @@ def integrate_eob_eccentric_dynamics(q, chi1=0.0, chi2=0.0, e0=0.1,
         Solver tolerances.
     kappa1, kappa2 : float
         Spin-induced quadrupole parameters (= 1 for black holes).
+    x_stop : float or str, optional
+        Stopping value for x. Options:
+        - None: stop at x=0.5 (default, PN breakdown)
+        - 'isco': compute x_ISCO from Kerr ISCO and stop there
+        - float: stop at this specific x value
 
     Returns
     -------
@@ -1126,6 +1157,7 @@ def integrate_eob_eccentric_dynamics(q, chi1=0.0, chi2=0.0, e0=0.1,
         e : array, eccentricity
         x : array, PN parameter
         zeta : array, relativistic anomaly
+        x_isco : float, estimated x at ISCO
         success : bool
         message : str
         sol : OdeResult
@@ -1163,6 +1195,23 @@ def integrate_eob_eccentric_dynamics(q, chi1=0.0, chi2=0.0, e0=0.1,
     kappa_S_val = 0.5 * (kappa1 + kappa2) - 1.0
     kappa_A_val = 0.5 * (kappa1 - kappa2)
 
+    # Compute x_ISCO for reference and optional stopping
+    x_isco = _compute_x_isco(chi1, chi2, q)
+
+    # Resolve x_stop
+    if x_stop == 'isco':
+        x_stop_val = x_isco
+    elif x_stop is not None:
+        x_stop_val = float(x_stop)
+    else:
+        x_stop_val = 0.5  # default: PN breakdown
+
+    # Build x termination event with the resolved x_stop value
+    def _event_x_stop(t, y, nu, chi_S, chi_A, delta, kappa_S, kappa_A):
+        return x_stop_val - y[1]
+    _event_x_stop.terminal = True
+    _event_x_stop.direction = -1
+
     x0 = omega0**(2.0 / 3.0)
 
     # Estimate inspiral time from circular 0PN: t_merge ~ 5/(256*nu*x0^4)
@@ -1174,7 +1223,8 @@ def integrate_eob_eccentric_dynamics(q, chi1=0.0, chi2=0.0, e0=0.1,
     y0 = [e0, x0, zeta0]
 
     logger.info("Integrating EOB eccentric dynamics: q=%.4f, chi1=%.4f, "
-                "chi2=%.4f, e0=%.4f, x0=%.6f", q, chi1, chi2, e0, x0)
+                "chi2=%.4f, e0=%.4f, x0=%.6f, x_stop=%.4f, x_isco=%.4f",
+                q, chi1, chi2, e0, x0, x_stop_val, x_isco)
 
     sol = solve_ivp(
         _rhs, t_span, y0,
@@ -1184,7 +1234,7 @@ def integrate_eob_eccentric_dynamics(q, chi1=0.0, chi2=0.0, e0=0.1,
         atol=atol,
         t_eval=t_eval,
         dense_output=True,
-        events=[_event_x_large, _event_e_negative, _event_oome2_small],
+        events=[_event_x_stop, _event_e_negative, _event_oome2_small],
         max_step=2.0 * PI / (10.0 * omega0),
     )
 
@@ -1196,6 +1246,7 @@ def integrate_eob_eccentric_dynamics(q, chi1=0.0, chi2=0.0, e0=0.1,
         'e': sol.y[0],
         'x': sol.y[1],
         'zeta': sol.y[2],
+        'x_isco': x_isco,
         'success': sol.success,
         'message': sol.message,
         'sol': sol,

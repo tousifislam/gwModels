@@ -26,6 +26,7 @@ def evolve_eccentric_nonprec_nonresum(q, chi1=0.0, chi2=0.0, e0=0.1, zeta0=0.0,
                                       omega0=0.0085, t_end=None,
                                       rtol=1e-10, atol=1e-12,
                                       kappa1=1.0, kappa2=1.0,
+                                      x_stop=None,
                                       include_pa=False,
                                       alpha=-16.0/3.0, beta=-13.0/2.0):
     """
@@ -68,7 +69,7 @@ def evolve_eccentric_nonprec_nonresum(q, chi1=0.0, chi2=0.0, e0=0.1, zeta0=0.0,
     secular = integrate_eob_eccentric_dynamics_nonresum(
         q=q, chi1=chi1, chi2=chi2, e0=e0, zeta0=zeta0,
         omega0=omega0, t_end=t_end, rtol=rtol, atol=atol,
-        kappa1=kappa1, kappa2=kappa2,
+        kappa1=kappa1, kappa2=kappa2, x_stop=x_stop,
     )
 
     t = secular['t']
