@@ -20,7 +20,8 @@ from scipy import interpolate
 import gwtools
 
 from ..utils.features import get_frequency
-from ..utils.alignment import mathcalE_error, phase_align_dict, check_pi_rotation, get_peak
+from ..utils.alignment import phase_align_dict, check_pi_rotation, get_peak
+from ..utils.metrics import mathcalE_error
 from ..utils.compute_local_peaks import PeakFinderScipy
 from ..frameworks.gwnrhme import NRHME
 
