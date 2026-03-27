@@ -22,9 +22,24 @@ def set_rcparams():
     import matplotlib.pyplot as plt
 
     plt.rc('figure', figsize=(8, 5))
+
+    # Try to enable LaTeX rendering; fall back to mathtext if LaTeX is not installed
+    try:
+        plt.rcParams.update({
+            'text.usetex': True,
+            'text.latex.preamble': r'\usepackage{amsmath}',
+        })
+        # Force a render to check if LaTeX actually works
+        import matplotlib
+        matplotlib.texmanager.TexManager().get_grey("$x$")
+    except Exception:
+        import logging
+        logging.getLogger(__name__).info("LaTeX not available, falling back to mathtext rendering")
+        plt.rcParams.update({
+            'text.usetex': False,
+        })
+
     plt.rcParams.update({
-        'text.usetex': True,
-        'text.latex.preamble': r'\usepackage{amsmath}',
         'font.family': 'serif',
         'font.serif': ['Georgia'],
         'mathtext.fontset': 'cm',
