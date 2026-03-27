@@ -24,7 +24,7 @@ from scipy.optimize import curve_fit
 from scipy import interpolate
 
 from ..utils import *
-from ..core import *
+from ..frameworks import *
 
 class ComputeEccentricityFromModulations():
     """
