@@ -1,2 +1,3 @@
-from .compute_ecc_xi import *
-from .compute_ecc_omega_ecc_gw import *
+from .compute_ecc_xi import ComputeEccentricityFromModulations, ComputeEccentricity
+from .compute_ecc_omega_ecc_gw import ComputeEccentricityFromOmega
+from .initial_eccentricity import compute_et_harmonic_3PN, compute_et_ADM_2PN
