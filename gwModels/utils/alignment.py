@@ -81,31 +81,6 @@ def check_pi_rotation(h_dict):
     return h_dict
              
     
-def mathcalE_error(h1, h2):
-    """
-    Computes the time-domain error between two waveforms.
-
-    This function calculates the error according to Equation 21 from the paper 
-    (https://arxiv.org/pdf/1701.00550.pdf) by normalizing the difference between 
-    the two waveforms.
-
-    Parameters:
-    h1 (np.ndarray): Reference waveform in the time domain.
-    h2 (np.ndarray): Comparison waveform in the time domain.
-
-    Returns:
-    np.ndarray: Normalized error for each time sample.
-    """
-    n1Sqr = np.sum(abs(h1**2))
-    n2Sqr = np.sum(abs(h2**2))
-
-    dots = np.array([(h1[i]*(h2[i].conjugate())) for i in range(len(h1))])
-    sdot = np.real(np.sum(dots))
-    # Assume h1 is the reference waveform and normalize by its magnitude
-    normed_errs = ((n1Sqr + n2Sqr) - 2*sdot)/(2*n1Sqr)
-    summed_err = np.sum(normed_errs)
-    return normed_errs
-
 def phase_align_dict(hdict):
     """
     Aligns a waveform dictionary to ensure proper phases.
