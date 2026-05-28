@@ -20,7 +20,7 @@ import numpy as np
 from .eccentricimr_wolfram import EccentricIMR
 from .circular_models import genNRHybSur3dq8, genBHPTNRSur1dq1e4
 from .lal_models import generate_IMRPhenomTHM
-from ..core.gwnrhme import NRHME
+from ..frameworks.gwnrhme import NRHME
 from ..utils import *
 
 class IMRHME(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
