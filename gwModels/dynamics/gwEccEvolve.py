@@ -11,7 +11,6 @@
 #==============================================================================
 __author__ = "Tousif Islam"
 
-import os
 import numpy as np
 from scipy.interpolate import InterpolatedUnivariateSpline
 from scipy.linalg import cho_solve
@@ -54,14 +53,10 @@ class gwEccEvolve_NoSpinq4:
     to predict the SVD coefficients as functions of (q, e0).
 
     Parameters:
-        model_path (str, optional): Path to the model .npy file.
-            If None, loads the bundled model from the package data directory.
+        model_path (str): Path to the model .npy file.
     """
 
-    def __init__(self, model_path=None):
-        if model_path is None:
-            model_path = os.path.join(os.path.dirname(__file__),
-                                      'data', 'gwEccEvolve_NoSpinq4.npy')
+    def __init__(self, model_path):
         data = np.load(model_path, allow_pickle=True)[()]
         self.tcommon = data['tcommon']
         self.Vh = data['Vh']
