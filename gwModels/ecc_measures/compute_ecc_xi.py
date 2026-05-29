@@ -313,7 +313,7 @@ class ComputeEccentricityFromModulations:
 
     def _compute_eccentricity_evolution(self):
         """Compute eccentricity evolution using modulation envelopes."""
-        self.ecc_xi = self.xi_avg.copy()
+        self.ecc_xi = self.xi_avg
         if self.set_unphysical_ecc_to_zero:
             _sanitize_array(self.ecc_xi)
 
