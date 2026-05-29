@@ -41,8 +41,8 @@ A framework to seamlessly convert a multi-modal (i.e with several spherical harm
 
 ### 2. Higher modes model with eccentricity
 These variants are obtained by combining circular and eccentric models through gwNRHME:
-- **NRHybSur3dq8-gwNRHME** = NRHybSur3dq8 ([arXiv:1812.07865](https://arxiv.org/abs/1812.07865)) + EccentricIMR ([arXiv:0806.1037](https://arxiv.org/abs/0806.1037))
-- **BHPTNRSur1dq1e4-gwNRHME** = BHPTNRSur1dq1e4 ([arXiv:2204.01972](https://arxiv.org/abs/2204.01972)) + EccentricIMR ([arXiv:0806.1037](https://arxiv.org/abs/0806.1037))
+- **NRHybSur3dq8-gwNRHME** = NRHybSur3dq8 ([arXiv:1812.07865](https://arxiv.org/abs/1812.07865)) + SEOBNRv5EHM
+- **BHPTNRSur1dq1e4-gwNRHME** = BHPTNRSur1dq1e4 ([arXiv:2204.01972](https://arxiv.org/abs/2204.01972)) + SEOBNRv5EHM
 
 Tutorials: [2_1_NRHybSur3dq8-gwNRHME_example.ipynb](tutorials/2_1_NRHybSur3dq8-gwNRHME_example.ipynb), [2_2_BHPTNRSur1dq1e4-gwNRHME_example.ipynb](tutorials/2_2_BHPTNRSur1dq1e4-gwNRHME_example.ipynb)
 
