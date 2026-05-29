@@ -16,7 +16,13 @@
 This package is intended to host a variety of data-driven and phenomenological models for the gravitational radiation (waveforms) emitted from binary black hole mergers. For questions, suggestions or collaborations, please feel free to drop an email to tousifislam24@gmail.com. Detailed documentation of the package is provided at http://tousifislam.com/gwModels/gwModels.html
 
 ## Getting the package
-The latest development version will always be available from the project git repository:
+
+### From PyPI
+```bash
+pip install gwModels
+```
+
+### From source
 ```bash
 git clone https://github.com/tousifislam/gwModels
 cd gwModels
@@ -24,7 +30,7 @@ pip install -e .
 ```
 
 ### Data files
-Model data files are stored in the `data/` directory. After cloning, verify all data files are present:
+Model data files are stored in the `data/` directory. After cloning from source, verify all data files are present:
 ```bash
 python gwmodels_setup_data.py
 ```

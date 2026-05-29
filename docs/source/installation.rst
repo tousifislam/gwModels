@@ -1,6 +1,13 @@
 Installation
 ============
 
+From PyPI
+---------
+
+.. code-block:: bash
+
+   pip install gwModels
+
 From source
 -----------
 
@@ -10,7 +17,7 @@ From source
    cd gwModels
    pip install -e .
 
-After cloning, verify all model data files are present:
+After cloning from source, verify all model data files are present:
 
 .. code-block:: bash
 
