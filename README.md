@@ -44,8 +44,8 @@ Eccentric waveform models obtained by combining circular surrogates with an ecce
 
 | Model | Components | Reference | Tutorial |
 |-------|------------|-----------|----------|
-| **NRHybSur3dq8-gwNRHME** | NRHybSur3dq8 + SEOBNRv5EHM | [1812.07865](https://arxiv.org/abs/1812.07865) | [2_1](tutorials/2_1_NRHybSur3dq8-gwNRHME_example.ipynb) |
-| **BHPTNRSur1dq1e4-gwNRHME** | BHPTNRSur1dq1e4 + SEOBNRv5EHM | [2204.01972](https://arxiv.org/abs/2204.01972) | [2_2](tutorials/2_2_BHPTNRSur1dq1e4-gwNRHME_example.ipynb) |
+| **NRHybSur3dq8-gwNRHME** | NRHybSur3dq8 + SEOBNRv5EHM | [2408.02762](https://arxiv.org/abs/2408.02762) | [2_1](tutorials/2_1_NRHybSur3dq8-gwNRHME_example.ipynb) |
+| **BHPTNRSur1dq1e4-gwNRHME** | BHPTNRSur1dq1e4 + SEOBNRv5EHM | [2408.02762](https://arxiv.org/abs/2408.02762) | [2_2](tutorials/2_2_BHPTNRSur1dq1e4-gwNRHME_example.ipynb) |
 
 ### 3. Eccentricity Estimation
 
