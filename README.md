@@ -31,12 +31,12 @@ python gwmodels_setup_data.py
 
 ### 1. Waveform Frameworks
 
-Frameworks for converting quasi-circular waveforms into eccentric waveforms using known quadrupolar eccentric waveforms ([arXiv:2403.15506](https://arxiv.org/abs/2403.15506)).
+Frameworks for converting quasi-circular waveforms into eccentric waveforms using known quadrupolar eccentric waveforms.
 
-| Model | Description | Tutorial |
-|-------|-------------|----------|
-| **gwNRHME** | Non-spinning quasi-circular HM waveform → eccentric | [1_1](tutorials/1_1_framework_gwNRHME_example.ipynb) |
-| **gwNRXHME** | Non-precessing quasi-circular HM waveform → eccentric | — |
+| Model | Description | Reference | Tutorial |
+|-------|-------------|-----------|----------|
+| **gwNRHME** | Non-spinning quasi-circular HM waveform → eccentric | [2403.15506](https://arxiv.org/abs/2403.15506) | [1_1](tutorials/1_1_framework_gwNRHME_example.ipynb) |
+| **gwNRXHME** | Non-precessing quasi-circular HM waveform → eccentric | [2502.02739](https://arxiv.org/abs/2502.02739) | — |
 
 ### 2. Eccentric Higher-Mode Waveforms
 
