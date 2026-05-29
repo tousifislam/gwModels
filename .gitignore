@@ -6,3 +6,4 @@ __pycache__/
 .h5
 .json
 data/
+docs/build/
