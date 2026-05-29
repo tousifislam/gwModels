@@ -102,12 +102,12 @@ class ComputeEccentricityFromOmega:
     def _compute_ecc_omega_22_at_tref(self):
         """Compute eccentricity ecc_omega_22 at tref."""
         self.ecc_omega_22_ref = self.ecc_omega_22_interp(self.t_ref)
-        logger.info('gwModels ecc_omega_22 at t_ref=%.2f : %.5f', self.t_ref, self.ecc_omega_22_ref)
+        print('... gwModels ecc_omega_22 at t_ref=%.2f : %.5f' % (self.t_ref, self.ecc_omega_22_ref))
 
     def _compute_ecc_gw_at_tref(self):
         """Compute eccentricity ecc_gw at tref."""
         self.ecc_gw_ref = self.ecc_gw_interp(self.t_ref)
-        logger.info('gwModels ecc_gw at t_ref=%.2f : %.5f', self.t_ref, self.ecc_gw_ref)
+        print('... gwModels ecc_gw at t_ref=%.2f : %.5f' % (self.t_ref, self.ecc_gw_ref))
 
     # -------------------------------------------------------------------------
     # Plotting

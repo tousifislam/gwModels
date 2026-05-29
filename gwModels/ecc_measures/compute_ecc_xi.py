@@ -352,7 +352,7 @@ class ComputeEccentricityFromModulations:
     def _compute_eccentricity_at_tref(self):
         """Compute eccentricity at t_ref."""
         self.ecc_ref = gwtools.interpolate_h(self.time_xi, self.ecc_xi, [self.t_ref])[0]
-        logger.info('gwModels eccentricity at t_ref=%.2f : %.5f', self.t_ref, self.ecc_ref)
+        print('... gwModels eccentricity at t_ref=%.2f : %.5f' % (self.t_ref, self.ecc_ref))
 
     # -------------------------------------------------------------------------
     # Plotting
