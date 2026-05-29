@@ -14,10 +14,15 @@ __author__ = "Tousif Islam"
 import logging
 import time
 
-import lal
-import lalsimulation as lalsim
 import numpy as np
 import gwtools
+
+try:
+    import lal
+    import lalsimulation as lalsim
+except ImportError:
+    lal = None
+    lalsim = None
 
 logger = logging.getLogger(__name__)
 
