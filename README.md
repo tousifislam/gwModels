@@ -43,8 +43,8 @@ Frameworks for converting quasi-circular waveforms into eccentric waveforms usin
 
 | Model | Description | Reference | Tutorial |
 |-------|-------------|-----------|----------|
-| **gwNRHME** | Non-spinning quasi-circular HM waveform → eccentric | [2403.15506](https://arxiv.org/abs/2403.15506) | [1_1](tutorials/1_1_framework_gwNRHME_example.ipynb) |
-| **gwNRXHME** | Non-precessing quasi-circular HM waveform → eccentric | [2502.02739](https://arxiv.org/abs/2502.02739) | [1_1](tutorials/1_1_framework_gwNRHME_example.ipynb) |
+| **gwNRHME** | Non-spinning quasi-circular HM waveform → eccentric | [2403.15506](https://arxiv.org/abs/2403.15506) | [1_1](https://github.com/tousifislam/gwModels/blob/main/tutorials/1_1_framework_gwNRHME_example.ipynb) |
+| **gwNRXHME** | Non-precessing quasi-circular HM waveform → eccentric | [2502.02739](https://arxiv.org/abs/2502.02739) | [1_1](https://github.com/tousifislam/gwModels/blob/main/tutorials/1_1_framework_gwNRHME_example.ipynb) |
 
 ### 2. Eccentric Higher-Mode Waveforms
 
@@ -52,22 +52,22 @@ Eccentric waveform models obtained by combining circular surrogates with an ecce
 
 | Model | Components | Reference | Tutorial |
 |-------|------------|-----------|----------|
-| **NRHybSur3dq8-gwNRHME** | NRHybSur3dq8 + SEOBNRv5EHM | [2408.02762](https://arxiv.org/abs/2408.02762) | [2_1](tutorials/2_1_NRHybSur3dq8-gwNRHME_example.ipynb) |
-| **BHPTNRSur1dq1e4-gwNRHME** | BHPTNRSur1dq1e4 + SEOBNRv5EHM | [2408.02762](https://arxiv.org/abs/2408.02762) | [2_2](tutorials/2_2_BHPTNRSur1dq1e4-gwNRHME_example.ipynb) |
+| **NRHybSur3dq8-gwNRHME** | NRHybSur3dq8 + SEOBNRv5EHM | [2408.02762](https://arxiv.org/abs/2408.02762) | [2_1](https://github.com/tousifislam/gwModels/blob/main/tutorials/2_1_NRHybSur3dq8-gwNRHME_example.ipynb) |
+| **BHPTNRSur1dq1e4-gwNRHME** | BHPTNRSur1dq1e4 + SEOBNRv5EHM | [2408.02762](https://arxiv.org/abs/2408.02762) | [2_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/2_2_BHPTNRSur1dq1e4-gwNRHME_example.ipynb) |
 
 ### 3. Eccentricity Estimation
 
 | Model | Description | Reference | Tutorial |
 |-------|-------------|-----------|----------|
-| **eccentricity_estimation** | Computes $e_{\xi}$, $e_{\omega}$, $e_{\rm gw}$ | [2502.02739](https://arxiv.org/abs/2502.02739) | [3_1](tutorials/3_1_eccentricity_estimation_nonprecessing.ipynb) |
+| **eccentricity_estimation** | Computes $e_{\xi}$, $e_{\omega}$, $e_{\rm gw}$ | [2502.02739](https://arxiv.org/abs/2502.02739) | [3_1](https://github.com/tousifislam/gwModels/blob/main/tutorials/3_1_eccentricity_estimation_nonprecessing.ipynb) |
 
 ### 4. Dynamics: Eccentricity Evolution
 
 | Model | Type | Parameter Range | Reference | Tutorial |
 |-------|------|-----------------|-----------|----------|
-| **gwEccEvNS** | NR-based approximate | Non-spinning | [2502.02739](https://arxiv.org/abs/2502.02739) | [4_1](tutorials/4_1_dynamics_gwEccEvNS.ipynb) |
-| **gwEccEvNSv2** | Analytical | Non-spinning | [2604.17868](https://arxiv.org/abs/2604.17868) | [4_2](tutorials/4_2_dynamics_gwEccEvNSv2.ipynb) |
-| **gwEccEvolve_NoSpinq4** | SVD surrogate + GPR | $1 \leq q \leq 4$, $0.003 \leq e_0 \leq 0.443$ | [2604.17868](https://arxiv.org/abs/2604.17868) | [4_3](tutorials/4_3_dynamics_gwEccEvolve_NoSpinq4.ipynb) |
+| **gwEccEvNS** | NR-based approximate | Non-spinning | [2502.02739](https://arxiv.org/abs/2502.02739) | [4_1](https://github.com/tousifislam/gwModels/blob/main/tutorials/4_1_dynamics_gwEccEvNS.ipynb) |
+| **gwEccEvNSv2** | Analytical | Non-spinning | [2604.17868](https://arxiv.org/abs/2604.17868) | [4_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/4_2_dynamics_gwEccEvNSv2.ipynb) |
+| **gwEccEvolve_NoSpinq4** | SVD surrogate + GPR | $1 \leq q \leq 4$, $0.003 \leq e_0 \leq 0.443$ | [2604.17868](https://arxiv.org/abs/2604.17868) | [4_3](https://github.com/tousifislam/gwModels/blob/main/tutorials/4_3_dynamics_gwEccEvolve_NoSpinq4.ipynb) |
 
 ### 5. Remnant Properties: Final Mass, Spin, and Kick
 
@@ -75,20 +75,20 @@ Eccentric waveform models obtained by combining circular surrogates with an ecce
 
 | Model | Type | Valid Range | Extra Deps | Reference | Tutorial |
 |-------|------|-------------|------------|-----------|----------|
-| **gwModel_kick_q200** | Analytical (aligned-spin) | $1 \leq q \leq 1000$ | — | [2511.11536](https://arxiv.org/abs/2511.11536) | [5_1](tutorials/5_1_gwModels_kicks.ipynb) |
-| **gwModel_kick_q200_GPR** | GPR (aligned-spin) | $1 \leq q \leq 1000$ | `scikit-learn` | [2511.11536](https://arxiv.org/abs/2511.11536) | [5_1](tutorials/5_1_gwModels_kicks.ipynb) |
-| **gwModel_kick_prec_flow** | Normalizing flow (precessing) | $q \leq 100$ | `torch`, `nflows` | [2511.11536](https://arxiv.org/abs/2511.11536) | [5_1](tutorials/5_1_gwModels_kicks.ipynb) |
-| **HLZ_2014_aligned_spin** | Analytical (aligned-spin) | — | — | [1406.7295](https://arxiv.org/abs/1406.7295) | [5_2](tutorials/5_2_other_remnant_models.ipynb) |
-| **bbh_final_kick_precessing_CLZM2007** | Analytical (precessing) | — | — | Gonzalez+ 2007, Campanelli+ 2007 | [5_2](tutorials/5_2_other_remnant_models.ipynb) |
+| **gwModel_kick_q200** | Analytical (aligned-spin) | $1 \leq q \leq 1000$ | — | [2511.11536](https://arxiv.org/abs/2511.11536) | [5_1](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_1_gwModels_kicks.ipynb) |
+| **gwModel_kick_q200_GPR** | GPR (aligned-spin) | $1 \leq q \leq 1000$ | `scikit-learn` | [2511.11536](https://arxiv.org/abs/2511.11536) | [5_1](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_1_gwModels_kicks.ipynb) |
+| **gwModel_kick_prec_flow** | Normalizing flow (precessing) | $q \leq 100$ | `torch`, `nflows` | [2511.11536](https://arxiv.org/abs/2511.11536) | [5_1](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_1_gwModels_kicks.ipynb) |
+| **HLZ_2014_aligned_spin** | Analytical (aligned-spin) | — | — | [1406.7295](https://arxiv.org/abs/1406.7295) | [5_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_2_other_remnant_models.ipynb) |
+| **bbh_final_kick_precessing_CLZM2007** | Analytical (precessing) | — | — | Gonzalez+ 2007, Campanelli+ 2007 | [5_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_2_other_remnant_models.ipynb) |
 
 #### Final mass and spin models
 
 | Model | Quantity | Spin Type | Reference | Tutorial |
 |-------|----------|-----------|-----------|----------|
-| **bbh_final_mass_precessing_BMR2012** | Final mass | Precessing | Barausse, Morozova & Rezzolla (2012) | [5_2](tutorials/5_2_other_remnant_models.ipynb) |
-| **bbh_final_spin_precessing_HBR2016** | Final spin | Precessing | Hofmann, Barausse & Rezzolla (2016) | [5_2](tutorials/5_2_other_remnant_models.ipynb) |
-| **bbh_final_mass_non_precessing_UIB2016** | Final mass | Aligned-spin | [1611.00332](https://arxiv.org/abs/1611.00332) | [5_2](tutorials/5_2_other_remnant_models.ipynb) |
-| **bbh_final_spin_non_precessing_UIB2016** | Final spin | Aligned-spin | [1611.00332](https://arxiv.org/abs/1611.00332) | [5_2](tutorials/5_2_other_remnant_models.ipynb) |
+| **bbh_final_mass_precessing_BMR2012** | Final mass | Precessing | Barausse, Morozova & Rezzolla (2012) | [5_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_2_other_remnant_models.ipynb) |
+| **bbh_final_spin_precessing_HBR2016** | Final spin | Precessing | Hofmann, Barausse & Rezzolla (2016) | [5_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_2_other_remnant_models.ipynb) |
+| **bbh_final_mass_non_precessing_UIB2016** | Final mass | Aligned-spin | [1611.00332](https://arxiv.org/abs/1611.00332) | [5_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_2_other_remnant_models.ipynb) |
+| **bbh_final_spin_non_precessing_UIB2016** | Final spin | Aligned-spin | [1611.00332](https://arxiv.org/abs/1611.00332) | [5_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_2_other_remnant_models.ipynb) |
 
 ## Requirements
 This package requires Python 3 and gwtools.
