@@ -38,26 +38,6 @@ class ComputeEccentricityFromModulations:
     Class to compute eccentricity using eccentric modulation parameter.
     """
 
-    # Available pseudo-PN correction terms: (power of tau/tau_0, parameter name)
-    PSEUDO_PN_TERMS = {
-        'm1over8': -1/8,
-        'm7over8': -7/8,
-        'm8over8': -1,
-    }
-
-    # Maps order string to which pseudo-PN terms to include
-    FIT_ORDER_MAP = {
-        '2PN':                          [],
-        '3PN':                          [],
-        '3PN_m1over8':                  ['m1over8'],
-        '3PN_m7over8':                  ['m7over8'],
-        '3PN_m8over8':                  ['m8over8'],
-        '3PN_m1over8_m8over8':          ['m1over8', 'm8over8'],
-        '3PN_m1over8_m7over8':          ['m1over8', 'm7over8'],
-        '3PN_m7over8_m8over8':          ['m7over8', 'm8over8'],
-        '3PN_m1over8_m7over8_m8over8':  ['m1over8', 'm7over8', 'm8over8'],
-    }
-
     def __init__(self, time_xi, xi, q, t_ref=None, ecc_prefactor=None,
                  distance_btw_peaks=100, fit_funcs_orders=None,
                  include_zero_zero=False, set_unphysical_xi_to_zero=False,
@@ -96,12 +76,12 @@ class ComputeEccentricityFromModulations:
         self.set_unphysical_ecc_to_zero = set_unphysical_ecc_to_zero
 
         # Resolve fit functions from order strings
-        if fit_funcs_orders is None:
-            self._fit_order_upper = '3PN'
-            self._fit_order_lower = '3PN'
+        self.fit_funcs_orders = fit_funcs_orders
+        if self.fit_funcs_orders is None:
+            self.fit_funcs = [self.fit_func_3PN, self.fit_func_3PN]
         else:
-            self._fit_order_upper = fit_funcs_orders[0]
-            self._fit_order_lower = fit_funcs_orders[1]
+            self.fit_funcs = [self.PNorder_to_func_translation(self.fit_funcs_orders[0]),
+                              self.PNorder_to_func_translation(self.fit_funcs_orders[1])]
 
         # Eccentricity prefactor; Eq (34) of https://arxiv.org/pdf/1702.00872
         self.ecc_prefactor = ecc_prefactor if ecc_prefactor is not None else 2/3
@@ -224,38 +204,94 @@ class ComputeEccentricityFromModulations:
         return result
 
     # -------------------------------------------------------------------------
-    # Fit functions — unified via _build_fit_func
+    # Fit functions
     # -------------------------------------------------------------------------
 
-    def _build_fit_func(self, order):
-        """
-        Build a fit function for the given PN order string.
+    def PNorder_to_func_translation(self, order):
+        """Translate fit function PN order string to fit function callable."""
+        PNorder_to_func_dict = {
+            '2PN': self.fit_func_2PN,
+            '3PN': self.fit_func_3PN,
+            '3PN_m1over8': self.fit_func_3PN_m1over8,
+            '3PN_m7over8': self.fit_func_3PN_m7over8,
+            '3PN_m8over8': self.fit_func_3PN_m8over8,
+            '3PN_m1over8_m8over8': self.fit_func_3PN_m1over8_m8over8,
+            '3PN_m1over8_m7over8': self.fit_func_3PN_m1over8_m7over8,
+            '3PN_m7over8_m8over8': self.fit_func_3PN_m7over8_m8over8,
+            '3PN_m1over8_m7over8_m8over8': self.fit_func_3PN_m1over8_m7over8_m8over8,
+        }
+        return PNorder_to_func_dict[order]
 
-        Returns a callable with signature f(t, e_0, *pseudo_coeffs) suitable
-        for scipy.optimize.curve_fit.
-        """
-        use_2pn = order.startswith('2PN')
-        pseudo_terms = self.FIT_ORDER_MAP[order]
-        pseudo_powers = [self.PSEUDO_PN_TERMS[k] for k in pseudo_terms]
+    def fit_func_2PN(self, t, e_0):
+        eta = gwtools.q_to_nu(self.q)
+        tau_0 = (self.tc - self.t_ref) * (eta / 5)
+        return self.PN_order2_e_t(t, e_0, self.q, tau_0)
 
-        def fit_func(t, e_0, *coeffs):
-            eta = gwtools.q_to_nu(self.q)
-            tau = (self.tc - t) * (eta / 5)
-            tau_0 = (self.tc - self.t_ref) * (eta / 5)
+    def fit_func_3PN(self, t, e_0):
+        eta = gwtools.q_to_nu(self.q)
+        tau_0 = (self.tc - self.t_ref) * (eta / 5)
+        return self.PN_e_t(t, e_0, self.q, tau_0)
 
-            if use_2pn:
-                e_base = self.PN_order2_e_t(t, e_0, self.q, tau_0)
-            else:
-                e_base = self.PN_e_t(t, e_0, self.q, tau_0)
+    def fit_func_3PN_m1over8(self, t, e_0, A1):
+        eta = gwtools.q_to_nu(self.q)
+        tau = (self.tc - t) * (eta / 5)
+        tau_0 = (self.tc - self.t_ref) * (eta / 5)
+        e_3PN = self.PN_e_t(t, e_0, self.q, tau_0)
+        e_m1over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A1 * (tau / tau_0) ** (-1 / 8)
+        return e_3PN + e_m1over8
 
-            # Add pseudo-PN correction terms
-            leading = e_0 * (tau / tau_0) ** (19 / 48)
-            for coeff, power in zip(coeffs, pseudo_powers):
-                e_base = e_base + leading * coeff * (tau / tau_0) ** power
+    def fit_func_3PN_m7over8(self, t, e_0, A7):
+        eta = gwtools.q_to_nu(self.q)
+        tau = (self.tc - t) * (eta / 5)
+        tau_0 = (self.tc - self.t_ref) * (eta / 5)
+        e_3PN = self.PN_e_t(t, e_0, self.q, tau_0)
+        e_m7over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A7 * (tau / tau_0) ** (-7 / 8)
+        return e_3PN + e_m7over8
 
-            return e_base
+    def fit_func_3PN_m8over8(self, t, e_0, A8):
+        eta = gwtools.q_to_nu(self.q)
+        tau = (self.tc - t) * (eta / 5)
+        tau_0 = (self.tc - self.t_ref) * (eta / 5)
+        e_3PN = self.PN_e_t(t, e_0, self.q, tau_0)
+        e_m8over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A8 * (tau / tau_0) ** (-8 / 8)
+        return e_3PN + e_m8over8
 
-        return fit_func
+    def fit_func_3PN_m1over8_m8over8(self, t, e_0, A1, A8):
+        eta = gwtools.q_to_nu(self.q)
+        tau = (self.tc - t) * (eta / 5)
+        tau_0 = (self.tc - self.t_ref) * (eta / 5)
+        e_3PN = self.PN_e_t(t, e_0, self.q, tau_0)
+        e_m1over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A1 * (tau / tau_0) ** (-1 / 8)
+        e_m8over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A8 * (tau / tau_0) ** (-1)
+        return e_3PN + e_m1over8 + e_m8over8
+
+    def fit_func_3PN_m1over8_m7over8(self, t, e_0, A1, A7):
+        eta = gwtools.q_to_nu(self.q)
+        tau = (self.tc - t) * (eta / 5)
+        tau_0 = (self.tc - self.t_ref) * (eta / 5)
+        e_3PN = self.PN_e_t(t, e_0, self.q, tau_0)
+        e_m1over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A1 * (tau / tau_0) ** (-1 / 8)
+        e_m7over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A7 * (tau / tau_0) ** (-7 / 8)
+        return e_3PN + e_m1over8 + e_m7over8
+
+    def fit_func_3PN_m7over8_m8over8(self, t, e_0, A7, A8):
+        eta = gwtools.q_to_nu(self.q)
+        tau = (self.tc - t) * (eta / 5)
+        tau_0 = (self.tc - self.t_ref) * (eta / 5)
+        e_3PN = self.PN_e_t(t, e_0, self.q, tau_0)
+        e_m7over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A7 * (tau / tau_0) ** (-7 / 8)
+        e_m8over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A8 * (tau / tau_0) ** (-1)
+        return e_3PN + e_m7over8 + e_m8over8
+
+    def fit_func_3PN_m1over8_m7over8_m8over8(self, t, e_0, A1, A7, A8):
+        eta = gwtools.q_to_nu(self.q)
+        tau = (self.tc - t) * (eta / 5)
+        tau_0 = (self.tc - self.t_ref) * (eta / 5)
+        e_3PN = self.PN_e_t(t, e_0, self.q, tau_0)
+        e_m1over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A1 * (tau / tau_0) ** (-1 / 8)
+        e_m7over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A7 * (tau / tau_0) ** (-7 / 8)
+        e_m8over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A8 * (tau / tau_0) ** (-1)
+        return e_3PN + e_m1over8 + e_m7over8 + e_m8over8
 
     # -------------------------------------------------------------------------
     # Peak finding and fitting
@@ -281,25 +317,21 @@ class ComputeEccentricityFromModulations:
 
     def _fit_maximas(self):
         """Fit the maximas using scipy.curve_fit."""
-        fit_func = self._build_fit_func(self._fit_order_upper)
-        self.popt_maximas, self.pcov_maximas = curve_fit(fit_func, self.t_maximas, self.y_maximas, maxfev=25000)
-        self._fit_func_upper = fit_func
+        self.popt_maximas, self.pcov_maximas = curve_fit(self.fit_funcs[0], self.t_maximas, self.y_maximas, maxfev=25000)
 
     def _fit_minimas(self):
         """Fit the minimas using scipy.curve_fit."""
-        fit_func = self._build_fit_func(self._fit_order_lower)
-        self.popt_minimas, self.pcov_minimas = curve_fit(fit_func, self.t_minimas, self.y_minimas, maxfev=25000)
-        self._fit_func_lower = fit_func
+        self.popt_minimas, self.pcov_minimas = curve_fit(self.fit_funcs[1], self.t_minimas, self.y_minimas, maxfev=25000)
 
     def _get_upper_xi_envelope(self):
         """Obtain upper envelope of the modulation time series."""
-        self.xi_upper = self._fit_func_upper(self.time_xi, *self.popt_maximas)
+        self.xi_upper = self.fit_funcs[0](self.time_xi, *self.popt_maximas)
         if self.set_unphysical_xi_to_zero:
             _sanitize_array(self.xi_upper)
 
     def _get_lower_xi_envelope(self):
         """Obtain lower envelope of the modulation time series."""
-        self.xi_lower = self._fit_func_lower(self.time_xi, *self.popt_minimas)
+        self.xi_lower = self.fit_funcs[1](self.time_xi, *self.popt_minimas)
         if self.set_unphysical_xi_to_zero:
             _sanitize_array(self.xi_lower)
 
