@@ -29,9 +29,10 @@ classifiers = [
 
 [project.optional-dependencies]
 lal = ["lalsuite"]
-surrogates = ["gwsurrogate", "BHPTNRSurrogate"]
+surrogates = ["gwsurrogate"]
 seob = ["pyseobnr"]
-all = ["lalsuite", "gwsurrogate", "BHPTNRSurrogate", "pyseobnr"]
+kicks = ["scikit-learn", "torch", "nflows"]
+all = ["lalsuite", "gwsurrogate", "pyseobnr", "scikit-learn", "torch", "nflows"]
 
 [tool.setuptools.packages.find]
 include = ["gwModels*"]
