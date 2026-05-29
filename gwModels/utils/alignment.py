@@ -15,35 +15,29 @@ __author__ = "Tousif Islam"
 
 import numpy as np
 import gwtools
-from scipy.interpolate import InterpolatedUnivariateSpline as spline
 
 def get_peak(t, func):
-    """"
-    Finds the peak time of a function using spline.
-    
-    Fits the provided function over the five points
-    closest to the argmax of the function to accurately find the peak.
+    """
+    Find the peak of a function via quadratic fit over 5 points closest to argmax.
 
     Parameters:
-    t (np.ndarray): An array of times.
-    func (np.ndarray): An array of function values.
+        t (np.ndarray): An array of times.
+        func (np.ndarray): An array of function values.
 
     Returns:
-    tuple: A tuple containing:
-        - tpeak (float): The time at which the peak occurs.
-        - fpeak (float): The function value at the peak.
+        tuple: (tpeak, fpeak)
     """
-    # Use a 4th degree spline for interpolation, so that the roots of its derivative can be found easily.
-    spl = spline(t, func, k=4)
-    # find the critical points
-    cr_pts = spl.derivative().roots()
-    # also check the endpoints of the interval
-    cr_pts = np.append(cr_pts, (t[0], func[-1]))  
-    # critial values
-    cr_vals = spl(cr_pts)
-    # we only care about the maximas
-    max_index = np.argmax(cr_vals)
-    return cr_pts[max_index], cr_vals[max_index]
+    index = np.argmax(func)
+    index = max(2, min(len(t) - 3, index))
+
+    testTimes = t[index-2:index+3] - t[index]
+    testFuncs = func[index-2:index+3]
+    xVecs = np.array([np.ones(5), testTimes, testTimes**2.])
+    invMat = np.linalg.inv(np.array([[v1.dot(v2) for v1 in xVecs]
+                                      for v2 in xVecs]))
+    yVec = np.array([testFuncs.dot(v1) for v1 in xVecs])
+    coefs = np.array([yVec.dot(v1) for v1 in invMat])
+    return t[index] - coefs[1] / (2. * coefs[2]), coefs[0] - coefs[1]**2. / 4 / coefs[2]
 
 
 def check_pi_rotation(h_dict):
@@ -81,31 +75,6 @@ def check_pi_rotation(h_dict):
     return h_dict
              
     
-def mathcalE_error(h1, h2):
-    """
-    Computes the time-domain error between two waveforms.
-
-    This function calculates the error according to Equation 21 from the paper 
-    (https://arxiv.org/pdf/1701.00550.pdf) by normalizing the difference between 
-    the two waveforms.
-
-    Parameters:
-    h1 (np.ndarray): Reference waveform in the time domain.
-    h2 (np.ndarray): Comparison waveform in the time domain.
-
-    Returns:
-    np.ndarray: Normalized error for each time sample.
-    """
-    n1Sqr = np.sum(abs(h1**2))
-    n2Sqr = np.sum(abs(h2**2))
-
-    dots = np.array([(h1[i]*(h2[i].conjugate())) for i in range(len(h1))])
-    sdot = np.real(np.sum(dots))
-    # Assume h1 is the reference waveform and normalize by its magnitude
-    normed_errs = ((n1Sqr + n2Sqr) - 2*sdot)/(2*n1Sqr)
-    summed_err = np.sum(normed_errs)
-    return normed_errs
-
 def phase_align_dict(hdict):
     """
     Aligns a waveform dictionary to ensure proper phases.

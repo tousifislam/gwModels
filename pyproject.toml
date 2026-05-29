@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gwModels"
+version = "0.0.8"
+description = "Python package to provide gravitational waveform models"
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "Tousif Islam", email = "tousifislam24@gmail.com"},
+]
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "gwtools",
+]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Natural Language :: English",
+    "Programming Language :: Python",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+[project.optional-dependencies]
+lal = ["lalsuite"]
+surrogates = ["gwsurrogate", "BHPTNRSurrogate"]
+seob = ["pyseobnr"]
+all = ["lalsuite", "gwsurrogate", "BHPTNRSurrogate", "pyseobnr"]
+
+[tool.setuptools.packages.find]
+include = ["gwModels*"]
