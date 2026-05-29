@@ -47,7 +47,9 @@ class IMRHME(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
         if self.circular_model not in ['NRHybSur3dq8', 'BHPTNRSur1dq1e4', 'IMRPhenomTHM']:
             raise ValueError(f"Unrecognized circular model '{self.circular_model}'. "
                              "Supported models: 'NRHybSur3dq8', 'BHPTNRSur1dq1e4', 'IMRPhenomTHM'.")
-        if self.circular_model == 'BHPTNRSur1dq1e4':
+        if self.circular_model == 'NRHybSur3dq8':
+            genNRHybSur3dq8.__init__(self)
+        elif self.circular_model == 'BHPTNRSur1dq1e4':
             self.model_obj = kwargs.get("model_obj")
             if self.model_obj is None:
                 raise ValueError("A model object for BHPTNRSur1dq1e4 must be provided!")
