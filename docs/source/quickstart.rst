@@ -40,7 +40,7 @@ Eccentricity evolution models
    e_evolved = model.predict(q=2, e0=0.1, x0=0.05)
 
    # SVD surrogate model
-   model = gwModels.dynamics.gwEccEvolve_NoSpinq4('data/gwEccEvolve_NoSpinq4.npy')
+   model = gwModels.dynamics.gwEccEvolve_NoSpinq4('gwModels/data/gwEccEvolve_NoSpinq4.npy')
    result = model(q=2, e0=0.1)
 
 Aligned-spin kick velocity
@@ -63,7 +63,7 @@ Precessing kick distribution
 
    from gwModels.remnants import gwModel_kick_prec_flow
 
-   model = gwModel_kick_prec_flow('data/')
+   model = gwModel_kick_prec_flow('gwModels/data/')
    samples = model.sample(q=3, a1=0.5, a2=0.4, num_samples=5000)
 
 Final mass and spin

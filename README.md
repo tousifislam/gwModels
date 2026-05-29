@@ -30,7 +30,7 @@ pip install -e .
 ```
 
 ### Data files
-Model data files are stored in the `data/` directory. After cloning from source, verify all data files are present:
+Model data files are stored in the `gwModels/data/` directory. After cloning from source, verify all data files are present:
 ```bash
 python gwmodels_setup_data.py
 ```

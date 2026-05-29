@@ -65,6 +65,6 @@ def check_data(datadir="data"):
 
 
 if __name__ == "__main__":
-    datadir = sys.argv[1] if len(sys.argv) > 1 else "data"
+    datadir = sys.argv[1] if len(sys.argv) > 1 else os.path.join("gwModels", "data")
     ok = check_data(datadir)
     sys.exit(0 if ok else 1)
