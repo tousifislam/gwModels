@@ -16,6 +16,7 @@ import warnings
 import numpy as np
 
 from .circular_models import genNRHybSur3dq8, genBHPTNRSur1dq1e4
+from .seob import genSEOBNRv5EHM
 from .lal_models import generate_IMRPhenomTHM
 from ..frameworks.gwnrhme import NRHME
 from ..utils.features import get_frequency
@@ -28,16 +29,14 @@ class IMRHME(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
     Class to generate eccentric non-spinning higher order spherical harmonics using
     a quadrupolar eccentric waveform model and a multi-modal circular model.
     """
-    def __init__(self, circular_model, eccentric_model, **kwargs):
+    def __init__(self, circular_model, eccentric_model='SEOBNRv5EHM', **kwargs):
         """
         Parameters:
             circular_model (str): Name of the multi-modal circular model
                             (e.g., 'NRHybSur3dq8', 'BHPTNRSur1dq1e4', 'IMRPhenomTHM').
             eccentric_model (str): Name of the quadrupolar eccentric model
-                            (e.g., 'EccentricIMR').
+                            (e.g., 'SEOBNRv5EHM').
             kwargs (dict): Optional keyword arguments including:
-                - wolfram_kernel_path (str): Absolute path for the Mathematica kernel.
-                - package_directory (str): Absolute path for the EccentricIMR package.
                 - model_obj (object): A model object for BHPTNRSur1dq1e4 model.
         """
 
@@ -55,19 +54,11 @@ class IMRHME(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
 
         # eccentric model
         self.eccentric_model = eccentric_model
-        if self.eccentric_model != 'EccentricIMR':
-            raise ValueError("Currently gwModels only supports 'EccentricIMR' as its eccentric base model!")
+        if self.eccentric_model == 'SEOBNRv5EHM':
+            self.wf = genSEOBNRv5EHM()
         else:
-            self.wolfram_kernel_path = kwargs.get("wolfram_kernel_path")
-            if self.wolfram_kernel_path is None:
-                raise ValueError("A path for the Wolfram Kernel must be provided!")
-
-            self.package_directory = kwargs.get("package_directory")
-            if self.package_directory is None:
-                raise ValueError("A path for the EccentricIMR package directory must be provided!")
-
-            from .eccentricimr_wolfram import EccentricIMR
-            self.wf = EccentricIMR(self.wolfram_kernel_path, self.package_directory)
+            raise ValueError(f"Unrecognized eccentric model '{self.eccentric_model}'. "
+                             "Supported models: 'SEOBNRv5EHM'.")
 
 
     def generate_waveform(self, params):
@@ -96,9 +87,9 @@ class IMRHME(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
                 logger.info("%s not found in params. Setting %s to zero.", key, key)
 
         # generate eccentric waveform
-        if self.eccentric_model == 'EccentricIMR':
-            tIMR, hIMR = self.wf.generate_waveform(params)
-            params["fIMR"] = self._obtain_circular_flow(tIMR, hIMR)
+        if self.eccentric_model == 'SEOBNRv5EHM':
+            tIMR, hIMR_dict = self.wf.generate_SEOBNRv5EHM(params)
+            hIMR = hIMR_dict['h_l2m2']
 
         # generate circular waveform
         if self.circular_model == 'NRHybSur3dq8':
@@ -108,8 +99,9 @@ class IMRHME(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
             t_cir, h_cir = self.generate_BHPTNRSur1dq1e4(self.model_obj, params)
 
         elif self.circular_model == 'IMRPhenomTHM':
+            fIMR = self._obtain_circular_flow(tIMR, hIMR)
             t_cir, h_cir = generate_IMRPhenomTHM(mass_ratio=params["q"],
-                                                 Momega0OverM=params["fIMR"])
+                                                 Momega0OverM=fIMR)
         else:
             raise ValueError(f"Circular model '{self.circular_model}' not implemented!")
 
@@ -161,15 +153,13 @@ class IMRHME(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
 class NRHybSur3dq8_gwNRHME():
     """
     Class to generate eccentric higher order spherical harmonics using
-    EccentricIMR and NRHybSur3dq8 model.
+    SEOBNRv5EHM and NRHybSur3dq8 model.
     """
-    def __init__(self, eccentric_model='EccentricIMR', **kwargs):
+    def __init__(self, eccentric_model='SEOBNRv5EHM', **kwargs):
         """
         Parameters:
             eccentric_model (str): Name of the eccentric quadrupolar model.
-            kwargs (dict): Optional keyword arguments including:
-                - wolfram_kernel_path (str): Absolute path for the Mathematica kernel.
-                - package_directory (str): Absolute path for the EccentricIMR package.
+            kwargs (dict): Optional keyword arguments.
         """
 
         self.wf_obj = IMRHME(circular_model='NRHybSur3dq8',
@@ -197,15 +187,13 @@ class NRHybSur3dq8_gwNRHME():
 class BHPTNRSur1dq1e4_gwNRHME():
     """
     Class to generate eccentric higher order spherical harmonics using
-    EccentricIMR and BHPTNRSur1dq1e4 model.
+    SEOBNRv5EHM and BHPTNRSur1dq1e4 model.
     """
-    def __init__(self, eccentric_model, **kwargs):
+    def __init__(self, eccentric_model='SEOBNRv5EHM', **kwargs):
         """
         Parameters:
             eccentric_model (str): Name of the eccentric quadrupolar model.
             kwargs (dict): Optional keyword arguments including:
-                - wolfram_kernel_path (str): Absolute path for the Mathematica kernel.
-                - package_directory (str): Absolute path for the EccentricIMR package.
                 - model_obj (object): A model object for BHPTNRSur1dq1e4 model.
         """
 
@@ -234,15 +222,13 @@ class BHPTNRSur1dq1e4_gwNRHME():
 class IMRPhenomTHM_gwNRHME():
     """
     Class to generate eccentric higher order spherical harmonics using
-    EccentricIMR and IMRPhenomTHM model.
+    SEOBNRv5EHM and IMRPhenomTHM model.
     """
-    def __init__(self, eccentric_model, **kwargs):
+    def __init__(self, eccentric_model='SEOBNRv5EHM', **kwargs):
         """
         Parameters:
             eccentric_model (str): Name of the eccentric quadrupolar model.
-            kwargs (dict): Optional keyword arguments including:
-                - wolfram_kernel_path (str): Absolute path for the Mathematica kernel.
-                - package_directory (str): Absolute path for the EccentricIMR package.
+            kwargs (dict): Optional keyword arguments.
         """
 
         self.wf_obj = IMRHME(circular_model='IMRPhenomTHM',
