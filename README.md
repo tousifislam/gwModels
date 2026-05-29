@@ -36,7 +36,7 @@ Frameworks for converting quasi-circular waveforms into eccentric waveforms usin
 | Model | Description | Reference | Tutorial |
 |-------|-------------|-----------|----------|
 | **gwNRHME** | Non-spinning quasi-circular HM waveform → eccentric | [2403.15506](https://arxiv.org/abs/2403.15506) | [1_1](tutorials/1_1_framework_gwNRHME_example.ipynb) |
-| **gwNRXHME** | Non-precessing quasi-circular HM waveform → eccentric | [2502.02739](https://arxiv.org/abs/2502.02739) | — |
+| **gwNRXHME** | Non-precessing quasi-circular HM waveform → eccentric | [2502.02739](https://arxiv.org/abs/2502.02739) | [1_1](tutorials/1_1_framework_gwNRHME_example.ipynb) |
 
 ### 2. Eccentric Higher-Mode Waveforms
 
