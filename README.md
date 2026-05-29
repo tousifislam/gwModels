@@ -164,25 +164,29 @@ If you make use of the gwModels framework, please cite the relevant papers:
 ```
 
 ```
-@article{Islam:2025ecc,
+@article{Islam:2026blk,
     author = "Islam, Tousif and others",
-    title = "{Eccentricity evolution models for non-spinning binary black holes}",
+    title = "{Including higher-order modes in a quadrupolar eccentric numerical relativity surrogate using universal eccentric modulation functions}",
     eprint = "2604.17868",
     archivePrefix = "arXiv",
     primaryClass = "gr-qc",
     month = "4",
-    year = "2025"
+    year = "2026"
 }
 ```
 
 ```
-@article{Islam:2025kick,
+@article{Islam:2025drw,
     author = "Islam, Tousif and Wadekar, Digvijay",
-    title = "{Kick velocity models for binary black hole mergers}",
+    title = "{Accurate models for recoil velocity distribution in black hole mergers with comparable to extreme mass-ratios and their astrophysical implications}",
     eprint = "2511.11536",
     archivePrefix = "arXiv",
     primaryClass = "gr-qc",
-    month = "11",
-    year = "2025"
+    doi = "10.1103/4jvv-qg4h",
+    journal = "Phys. Rev. D",
+    volume = "113",
+    number = "10",
+    pages = "104017",
+    year = "2026"
 }
 ```
