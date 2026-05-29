@@ -6,6 +6,7 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2511.11536-b31b1b.svg)](https://arxiv.org/abs/2511.11536)
 ![alt text](gwModels.png)
 ![Visitors](https://komarev.com/ghpvc/?username=tousifislam-gwModels&label=visits&color=brightgreen&base=1547)
+[![Documentation](https://img.shields.io/badge/docs-online-brightgreen)](https://tousifislam.com/gwModels/)
 [![License](https://img.shields.io/github/license/tousifislam/gwModels)](https://github.com/tousifislam/gwModels/blob/main/LICENSE)
 ![Created](https://img.shields.io/badge/created-March%202024-blue)
 ![Last Updated](https://img.shields.io/badge/last%20updated-May%202026-blue)
