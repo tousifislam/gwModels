@@ -77,9 +77,9 @@ class IMRHME(genNRHybSur3dq8, genBHPTNRSur1dq1e4):
         Parameters:
             params (dict): Dictionary containing waveform parameters with the following keys:
                 - q (float): Mass ratio of the binary system.
-                - e0 (float): Initial eccentricity at x0.
-                - l0 (float): Initial mean anomaly at x0.
-                - x0 (float): Initial dimensionless orbital frequency.
+                - e0 (float): Initial eccentricity at omega0.
+                - l0 (float): Initial mean anomaly at omega0.
+                - omega0 (float): Initial dimensionless orbital frequency.
 
         Returns:
             tuple: (tNRE, hNRE) — time array and generated eccentric waveform data.
@@ -183,9 +183,9 @@ class NRHybSur3dq8_gwNRHME():
         Parameters:
             params (dict): Dictionary containing waveform parameters with the following keys:
                 - q (float): Mass ratio of the binary system.
-                - e0 (float): Initial eccentricity at x0.
-                - l0 (float): Initial mean anomaly at x0.
-                - x0 (float): Initial dimensionless orbital frequency.
+                - e0 (float): Initial eccentricity at omega0.
+                - l0 (float): Initial mean anomaly at omega0.
+                - omega0 (float): Initial dimensionless orbital frequency.
 
         Returns:
             tuple: (tNRE, hNRE) — time array and generated eccentric waveform data.
@@ -220,9 +220,9 @@ class BHPTNRSur1dq1e4_gwNRHME():
         Parameters:
             params (dict): Dictionary containing waveform parameters with the following keys:
                 - q (float): Mass ratio of the binary system.
-                - e0 (float): Initial eccentricity at x0.
-                - l0 (float): Initial mean anomaly at x0.
-                - x0 (float): Initial dimensionless orbital frequency.
+                - e0 (float): Initial eccentricity at omega0.
+                - l0 (float): Initial mean anomaly at omega0.
+                - omega0 (float): Initial dimensionless orbital frequency.
 
         Returns:
             tuple: (tNRE, hNRE) — time array and generated eccentric waveform data.
@@ -256,9 +256,9 @@ class IMRPhenomTHM_gwNRHME():
         Parameters:
             params (dict): Dictionary containing waveform parameters with the following keys:
                 - q (float): Mass ratio of the binary system.
-                - e0 (float): Initial eccentricity at x0.
-                - l0 (float): Initial mean anomaly at x0.
-                - x0 (float): Initial dimensionless orbital frequency.
+                - e0 (float): Initial eccentricity at omega0.
+                - l0 (float): Initial mean anomaly at omega0.
+                - omega0 (float): Initial dimensionless orbital frequency.
 
         Returns:
             tuple: (tNRE, hNRE) — time array and generated eccentric waveform data.

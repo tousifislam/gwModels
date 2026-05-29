@@ -132,7 +132,7 @@ class genNRHybSur3dq8:
         chiB = [0, 0, params["s2z"]]
         dt = 0.1
         # 0.99 ensures the circular waveform is slightly longer than the eccentric one
-        f_low = 0.99 * (params['x0'] ** (3/2)) / (np.pi)
+        f_low = 0.99 * params['omega0'] / (np.pi)
         t, h, dyn = self.sur(q, chiA, chiB, dt=dt, f_low=f_low)
         return t, h
 
