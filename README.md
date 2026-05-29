@@ -7,8 +7,8 @@
 ![alt text](gwModels.png)
 ![Visitors](https://komarev.com/ghpvc/?username=tousifislam-gwModels&label=visits&color=brightgreen&base=1547)
 [![License](https://img.shields.io/github/license/tousifislam/gwModels)](https://github.com/tousifislam/gwModels/blob/main/LICENSE)
-![Created](https://img.shields.io/github/created-at/tousifislam/gwModels?label=created&style=flat-square)
-![Last Updated](https://img.shields.io/github/last-commit/tousifislam/gwModels/main?label=last%20updated)
+![Created](https://img.shields.io/badge/created-March%202024-blue)
+![Last Updated](https://img.shields.io/badge/last%20updated-May%202026-blue)
 
 ## **gwModels**
 This package is intended to host a variety of data-driven and phenomenological models for the gravitational radiation (waveforms) emitted from binary black hole mergers. For questions, suggestions or collaborations, please feel free to drop an email to tousifislam24@gmail.com. Detailed documentation of the package is provided at http://tousifislam.com/gwModels/gwModels.html
