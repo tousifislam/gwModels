@@ -95,6 +95,12 @@ Optional dependencies for specific models:
 - `torch`, `nflows` — for `gwModel_kick_prec_flow`
 - `gwsurrogate` — for NRHybSur3dq8-gwNRHME and BHPTNRSur1dq1e4-gwNRHME tutorials
 
+Install optional groups with:
+```bash
+pip install gwModels[kicks]       # scikit-learn, torch, nflows for remnant kick models
+pip install gwModels[all]         # all optional dependencies
+```
+
 ## Issue tracker
 Known bugs are recorded in the project bug tracker:
 https://github.com/tousifislam/gwModels/issues
