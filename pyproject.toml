@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gwModels"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python package to provide models for gravitational waveforms, remnants and dynamics"
 readme = "README.md"
 license = "MIT"
@@ -36,3 +36,6 @@ all = ["lalsuite", "gwsurrogate", "pyseobnr", "scikit-learn", "torch", "nflows"]
 
 [tool.setuptools.packages.find]
 include = ["gwModels*"]
+
+[tool.setuptools.package-data]
+gwModels = ["data/*.npy", "data/*.pt", "data/*.pkl"]
