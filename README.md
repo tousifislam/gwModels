@@ -31,64 +31,56 @@ python gwmodels_setup_data.py
 
 ### 1. Waveform Frameworks
 
-#### 1a. gwNRHME
-A framework to seamlessly convert a multi-modal (i.e with several spherical harmonic modes) non-spinning quasi-circular waveform into multi-modal eccentric waveform if the quadrupolar eccentric waveform is known ([arXiv:2403.15506](https://arxiv.org/abs/2403.15506)).
+Frameworks for converting quasi-circular waveforms into eccentric waveforms using known quadrupolar eccentric waveforms ([arXiv:2403.15506](https://arxiv.org/abs/2403.15506)).
 
-Tutorial: [1_1_framework_gwNRHME_example.ipynb](tutorials/1_1_framework_gwNRHME_example.ipynb)
+| Model | Description | Tutorial |
+|-------|-------------|----------|
+| **gwNRHME** | Non-spinning quasi-circular HM waveform → eccentric | [1_1](tutorials/1_1_framework_gwNRHME_example.ipynb) |
+| **gwNRXHME** | Non-precessing quasi-circular HM waveform → eccentric | — |
 
-#### 1b. gwNRXHME
-A framework to seamlessly convert a multi-modal (i.e with several spherical harmonic modes) non-precessing quasi-circular waveform into multi-modal eccentric waveform if the quadrupolar eccentric waveform is known ([arXiv:2403.15506](https://arxiv.org/abs/2403.15506)).
+### 2. Eccentric Higher-Mode Waveforms
 
-### 2. Higher modes model with eccentricity
-These variants are obtained by combining circular and eccentric models through gwNRHME:
-- **NRHybSur3dq8-gwNRHME** = NRHybSur3dq8 ([arXiv:1812.07865](https://arxiv.org/abs/1812.07865)) + SEOBNRv5EHM
-- **BHPTNRSur1dq1e4-gwNRHME** = BHPTNRSur1dq1e4 ([arXiv:2204.01972](https://arxiv.org/abs/2204.01972)) + SEOBNRv5EHM
+Eccentric waveform models obtained by combining circular surrogates with an eccentric model through gwNRHME.
 
-Tutorials: [2_1_NRHybSur3dq8-gwNRHME_example.ipynb](tutorials/2_1_NRHybSur3dq8-gwNRHME_example.ipynb), [2_2_BHPTNRSur1dq1e4-gwNRHME_example.ipynb](tutorials/2_2_BHPTNRSur1dq1e4-gwNRHME_example.ipynb)
+| Model | Components | Reference | Tutorial |
+|-------|------------|-----------|----------|
+| **NRHybSur3dq8-gwNRHME** | NRHybSur3dq8 + SEOBNRv5EHM | [1812.07865](https://arxiv.org/abs/1812.07865) | [2_1](tutorials/2_1_NRHybSur3dq8-gwNRHME_example.ipynb) |
+| **BHPTNRSur1dq1e4-gwNRHME** | BHPTNRSur1dq1e4 + SEOBNRv5EHM | [2204.01972](https://arxiv.org/abs/2204.01972) | [2_2](tutorials/2_2_BHPTNRSur1dq1e4-gwNRHME_example.ipynb) |
 
-### 3. Eccentricity estimation
-Calculates $e_{\xi}$, $e_{\omega}$ and $e_{\rm gw}$ following Islam and Venumadhav ([arXiv:2502.02739](https://arxiv.org/abs/2502.02739)).
+### 3. Eccentricity Estimation
 
-Tutorial: [3_1_eccentricity_estimation_nonprecessing.ipynb](tutorials/3_1_eccentricity_estimation_nonprecessing.ipynb)
+| Model | Description | Reference | Tutorial |
+|-------|-------------|-----------|----------|
+| **eccentricity_estimation** | Computes $e_{\xi}$, $e_{\omega}$, $e_{\rm gw}$ | [2502.02739](https://arxiv.org/abs/2502.02739) | [3_1](tutorials/3_1_eccentricity_estimation_nonprecessing.ipynb) |
 
-### 4. Dynamics: eccentricity evolution models
+### 4. Dynamics: Eccentricity Evolution
 
-#### 4a. gwEccEvNS
-A fast approximate eccentricity evolution model for non-spinning binaries based on SXS NR simulations from Islam and Venumadhav ([arXiv:2502.02739](https://arxiv.org/abs/2502.02739)).
+| Model | Type | Parameter Range | Reference | Tutorial |
+|-------|------|-----------------|-----------|----------|
+| **gwEccEvNS** | NR-based approximate | Non-spinning | [2502.02739](https://arxiv.org/abs/2502.02739) | [4_1](tutorials/4_1_dynamics_gwEccEvNS.ipynb) |
+| **gwEccEvNSv2** | Analytical | Non-spinning | [2604.17868](https://arxiv.org/abs/2604.17868) | [4_2](tutorials/4_2_dynamics_gwEccEvNSv2.ipynb) |
+| **gwEccEvolve_NoSpinq4** | SVD surrogate + GPR | $1 \leq q \leq 4$, $0.003 \leq e_0 \leq 0.443$ | [2604.17868](https://arxiv.org/abs/2604.17868) | [4_3](tutorials/4_3_dynamics_gwEccEvolve_NoSpinq4.ipynb) |
 
-Tutorial: [4_1_dynamics_gwEccEvNS.ipynb](tutorials/4_1_dynamics_gwEccEvNS.ipynb)
+### 5. Remnant Properties: Final Mass, Spin, and Kick
 
-#### 4b. gwEccEvNSv2
-Analytical eccentricity evolution model for non-spinning binaries from Islam et al. ([arXiv:2604.17868](https://arxiv.org/abs/2604.17868)).
+#### Kick velocity models
 
-Tutorial: [4_2_dynamics_gwEccEvNSv2.ipynb](tutorials/4_2_dynamics_gwEccEvNSv2.ipynb)
+| Model | Type | Valid Range | Extra Deps | Reference | Tutorial |
+|-------|------|-------------|------------|-----------|----------|
+| **gwModel_kick_q200** | Analytical (aligned-spin) | $1 \leq q \leq 1000$ | — | [2511.11536](https://arxiv.org/abs/2511.11536) | [5_1](tutorials/5_1_gwModels_kicks.ipynb) |
+| **gwModel_kick_q200_GPR** | GPR (aligned-spin) | $1 \leq q \leq 1000$ | `scikit-learn` | [2511.11536](https://arxiv.org/abs/2511.11536) | [5_1](tutorials/5_1_gwModels_kicks.ipynb) |
+| **gwModel_kick_prec_flow** | Normalizing flow (precessing) | $q \leq 100$ | `torch`, `nflows` | [2511.11536](https://arxiv.org/abs/2511.11536) | [5_1](tutorials/5_1_gwModels_kicks.ipynb) |
+| **HLZ_2014_aligned_spin** | Analytical (aligned-spin) | — | — | [1406.7295](https://arxiv.org/abs/1406.7295) | [5_2](tutorials/5_2_other_remnant_models.ipynb) |
+| **bbh_final_kick_precessing_CLZM2007** | Analytical (precessing) | — | — | Gonzalez+ 2007, Campanelli+ 2007 | [5_2](tutorials/5_2_other_remnant_models.ipynb) |
 
-#### 4c. gwEccEvolve_NoSpinq4
-SVD-based surrogate model for eccentricity evolution in non-spinning BBH systems ($1 \leq q \leq 4$, $0.003 \leq e_0 \leq 0.443$) from Islam et al. ([arXiv:2604.17868](https://arxiv.org/abs/2604.17868)). Uses Gaussian Process Regression for SVD coefficient prediction (pure numpy/scipy, no scikit-learn dependency).
+#### Final mass and spin models
 
-Tutorial: [4_3_dynamics_gwEccEvolve_NoSpinq4.ipynb](tutorials/4_3_dynamics_gwEccEvolve_NoSpinq4.ipynb)
-
-### 5. Remnant models: final mass, spin, and kick
-
-#### 5a. gwModel_kick_q200 (aligned-spin kick)
-Analytical aligned-spin kick velocity model trained on NR (SXS + RIT, $q \leq 32$) and BHPT data ($q \leq 200$), valid for $1 \leq q \leq 1000$, from Islam and Wadekar ([arXiv:2511.11536](https://arxiv.org/abs/2511.11536)).
-
-#### 5b. gwModel_kick_q200_GPR (aligned-spin GPR kick)
-GPR-based aligned-spin kick model trained on the same dataset, providing both analytical and GPR predictions with uncertainty. Requires `scikit-learn`. From Islam and Wadekar ([arXiv:2511.11536](https://arxiv.org/abs/2511.11536)).
-
-#### 5c. gwModel_kick_prec_flow (precessing kick)
-Normalizing-flow model for precessing-spin kick velocity distributions. Given $(q, a_1, a_2)$, marginalizes over spin angles and returns samples from the kick distribution. Requires `torch` and `nflows`. From Islam and Wadekar ([arXiv:2511.11536](https://arxiv.org/abs/2511.11536)).
-
-#### 5d. HLZ precessing kick
-Precessing kick velocity from Gonzalez et al. (2007), Campanelli et al. (2007), Lousto & Zlochower (2008, 2013). Includes aligned-spin variant from [arXiv:1406.7295](https://arxiv.org/abs/1406.7295).
-
-#### 5e. HBR final mass and spin
-Final mass from Barausse, Morozova & Rezzolla (2012) and final spin from Hofmann, Barausse & Rezzolla (2016).
-
-#### 5f. UIB2016 final mass and spin
-Aligned-spin final mass and spin from Jimenez Forteza, Keitel, Husa et al. ([arXiv:1611.00332](https://arxiv.org/abs/1611.00332)).
-
-Tutorials: [5_1_gwModels_kicks.ipynb](tutorials/5_1_gwModels_kicks.ipynb), [5_2_other_remnant_models.ipynb](tutorials/5_2_other_remnant_models.ipynb)
+| Model | Quantity | Spin Type | Reference | Tutorial |
+|-------|----------|-----------|-----------|----------|
+| **bbh_final_mass_precessing_BMR2012** | Final mass | Precessing | Barausse, Morozova & Rezzolla (2012) | [5_2](tutorials/5_2_other_remnant_models.ipynb) |
+| **bbh_final_spin_precessing_HBR2016** | Final spin | Precessing | Hofmann, Barausse & Rezzolla (2016) | [5_2](tutorials/5_2_other_remnant_models.ipynb) |
+| **bbh_final_mass_non_precessing_UIB2016** | Final mass | Aligned-spin | [1611.00332](https://arxiv.org/abs/1611.00332) | [5_2](tutorials/5_2_other_remnant_models.ipynb) |
+| **bbh_final_spin_non_precessing_UIB2016** | Final spin | Aligned-spin | [1611.00332](https://arxiv.org/abs/1611.00332) | [5_2](tutorials/5_2_other_remnant_models.ipynb) |
 
 ## Requirements
 This package requires Python 3 and gwtools.
