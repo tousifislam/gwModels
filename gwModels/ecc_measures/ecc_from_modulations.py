@@ -2,7 +2,7 @@
 #-*- coding: utf-8 -*-
 #==============================================================================
 #
-#    FILE: compute_ecc_xi.py
+#    FILE: ecc_from_modulations.py
 #    Computes eccentricity given eccentric and circular waveforms or
 #    given eccentric modulations
 #
@@ -22,6 +22,9 @@ import gwtools
 from ..utils.metrics import mathcalE_error
 from ..utils.compute_local_peaks import PeakFinderScipy
 from ..frameworks.gwnrhme import NRHME
+from .pn_eccentricity import Newtonian_e_t, PN2_e_t, PN3_e_t
+from ..utils.constants import B_AMP_FREQ
+from . import plotting
 
 logger = logging.getLogger(__name__)
 
@@ -50,8 +53,13 @@ class ComputeEccentricityFromModulations:
             t_ref: reference time to compute eccentricity
             ecc_prefactor: pre-factor in eccentricity definition; default is 2/3
             distance_btw_peaks: distance between peaks for PeakFinderScipy; default: 100
-            fit_funcs_orders: orders of the upper and lower xi fit functions;
-                              available options: keys of FIT_ORDER_MAP
+            fit_funcs_orders: list of two strings specifying the PN fit orders
+                              for the upper and lower xi envelopes, respectively.
+                              Available options: '2PN', '3PN', '3PN_m1over8',
+                              '3PN_m7over8', '3PN_m8over8', '3PN_m1over8_m8over8',
+                              '3PN_m1over8_m7over8', '3PN_m7over8_m8over8',
+                              '3PN_m1over8_m7over8_m8over8'.
+                              Default: ['3PN_m1over8', '3PN_m1over8']
             include_zero_zero: if True, include (t=0, y=0) to extrema lists
             set_unphysical_xi_to_zero: if True, set negative/NaN values in fitted xi to zero
             set_unphysical_ecc_to_zero: if True, set negative/NaN values in fitted eccentricity to zero
@@ -78,7 +86,7 @@ class ComputeEccentricityFromModulations:
         # Resolve fit functions from order strings
         self.fit_funcs_orders = fit_funcs_orders
         if self.fit_funcs_orders is None:
-            self.fit_funcs = [self.fit_func_3PN, self.fit_func_3PN]
+            self.fit_funcs = [self.fit_func_3PN_m1over8, self.fit_func_3PN_m1over8]
         else:
             self.fit_funcs = [self.PNorder_to_func_translation(self.fit_funcs_orders[0]),
                               self.PNorder_to_func_translation(self.fit_funcs_orders[1])]
@@ -113,95 +121,35 @@ class ComputeEccentricityFromModulations:
         self.xi_lower_fit_error = mathcalE_error(self.y_minimas, self.xi_lower_interp(self.t_minimas))
 
     # -------------------------------------------------------------------------
-    # PN eccentricity evolution
+    # PN eccentricity evolution (delegate to standalone functions)
     # -------------------------------------------------------------------------
 
-    def _compute_tau(self, t, tau_0=None):
-        """Compute dimensionless time variables tau and tau_0."""
-        eta = gwtools.q_to_nu(self.q)
-        tau = (self.tc - t) * (eta / 5)
-        if tau_0 is None:
-            tau_0 = (self.tc - self.t_ref) * (eta / 5)
-        return tau, tau_0, eta
-
     def Newtonian_e_t(self, t, e_0, q, tau_0=None):
-        """
-        Newtonian eccentricity evolution.
-        Page 41, Eq C1 of https://arxiv.org/pdf/1605.00304
-        """
-        eta = gwtools.q_to_nu(q)
-        tau = (self.tc - t) * (eta / 5)
-        if tau_0 is None:
-            tau_0 = (self.tc - self.t_ref) * (eta / 5)
-        return e_0 * (tau / tau_0) ** (19 / 48)
+        """Newtonian eccentricity evolution."""
+        t_ref = self.t_ref if tau_0 is None else None
+        if tau_0 is not None:
+            eta = gwtools.q_to_nu(q)
+            t_ref_from_tau0 = self.tc - tau_0 * 5 / eta
+            return Newtonian_e_t(t, e_0, q, tc=self.tc, t_ref=t_ref_from_tau0)
+        return Newtonian_e_t(t, e_0, q, tc=self.tc, t_ref=t_ref)
 
     def PN_order2_e_t(self, t, e_0, q, tau_0=None):
-        """2PN eccentricity evolution equation."""
-        eta = gwtools.q_to_nu(q)
-        tau = (self.tc - t) * (eta / 5)
-        if tau_0 is None:
-            tau_0 = (self.tc - self.t_ref) * (eta / 5)
-
-        term1 = (tau / tau_0) ** (19 / 48)
-        term2 = -4445 / 6912 * (tau ** (-1 / 4) - tau_0 ** (-1 / 4))
-        term3 = 854531845 / 4682022912 * tau ** (-1 / 2)
-        term4 = 1081754605 / 4682022912 * tau_0 ** (-1 / 2)
-        term5 = -19758025 / 47775744 * tau ** (-1 / 4) * tau_0 ** (-1 / 4)
-        term6 = -3721 / 33177600 * np.pi ** 2 * tau ** (-3 / 8) * tau_0 ** (-3 / 8)
-        term7 = (255918223951763603 / 186891372173721600
-                 - 15943 / 80640 * np.euler_gamma
-                 - 7926071 / 66355200 * np.pi ** 2) * tau ** (-3 / 4)
-        term8 = (-250085444105408603 / 186891372173721600
-                 + 15943 / 80640 * np.euler_gamma
-                 + 7933513 / 66355200 * np.pi ** 2) * tau_0 ** (-3 / 4)
-
-        g_2pn = term1 * (1 + term2 + term3 + term4 + term5 + term6 + term7 + term8)
-        return e_0 * g_2pn
+        """2PN eccentricity evolution."""
+        t_ref = self.t_ref if tau_0 is None else None
+        if tau_0 is not None:
+            eta = gwtools.q_to_nu(q)
+            t_ref_from_tau0 = self.tc - tau_0 * 5 / eta
+            return PN2_e_t(t, e_0, q, tc=self.tc, t_ref=t_ref_from_tau0)
+        return PN2_e_t(t, e_0, q, tc=self.tc, t_ref=t_ref)
 
     def PN_e_t(self, t, e_0, q, tau_0=None):
-        """
-        3PN eccentricity evolution equation.
-        Page 41, Eq C1 of https://arxiv.org/pdf/1605.00304
-        """
-        eta = gwtools.q_to_nu(q)
-        tau = (self.tc - t) * (eta / 5)
-        if tau_0 is None:
-            tau_0 = (self.tc - self.t_ref) * (eta / 5)
-
-        term1 = e_0 * (tau / tau_0) ** (19 / 48)
-        term2 = (-4445 / 6912 + 185 / 576 * eta) * (tau ** (-1 / 4) - tau_0 ** (-1 / 4))
-        term3 = -61 / 5760 * np.pi * (tau ** (-3 / 8) - tau_0 ** (-3 / 8))
-        term4 = (854531845 / 4682022912 - 15215083 / 27869184 * eta + 72733 / 663552 * eta ** 2) * tau ** (-1 / 2)
-        term5 = (1081754605 / 4682022912 + 3702533 / 27869184 * eta - 4283 / 663552 * eta ** 2) * tau_0 ** (-1 / 2)
-        term6 = (-19758025 / 47775744 + 822325 / 1990656 * eta - 34225 / 331776 * eta ** 2) * tau ** (-1 / 4) * tau_0 ** (-1 / 4)
-        term7 = (104976437 / 278691840 - 4848113 / 23224320 * eta) * np.pi * tau ** (-5 / 8)
-        term8 = (-101180407 / 278691840 + 4690123 / 23224320 * eta) * np.pi * tau_0 ** (-5 / 8)
-        term9 = np.pi * (-54229 / 7962624 + 2257 / 663552 * eta) * (tau ** (-1 / 4) * tau_0 ** (-3 / 8) + tau ** (-3 / 8) * tau_0 ** (-1 / 4))
-        term10 = (-686914174175 / 4623163195392 - 10094675555 / 898948399104 * eta + 501067585 / 10701766656 * eta ** 2 - 792355 / 382205952 * eta ** 3) * tau ** (-1 / 4) * tau_0 ** (-1 / 2)
-        term11 = -3721 / 33177600 * np.pi ** 2 * tau ** (-3 / 8) * tau_0 ** (-3 / 8)
-        term12 = (542627721575 / 4623163195392 - 122769222935 / 299649466368 * eta + 2630889335 / 10701766656 * eta ** 2 - 13455605 / 382205952 * eta ** 3) * tau ** (-1 / 2) * tau_0 ** (-1 / 4)
-        term13 = (255918223951763603 / 186891372173721600
-                  - 15943 / 80640 * np.euler_gamma
-                  - 7926071 / 66355200 * np.pi ** 2
-                  + (-81120341684927 / 13484225986560 + 12751 / 49152 * np.pi ** 2) * eta
-                  - 3929671247 / 32105299968 * eta ** 2
-                  + 25957133 / 1146617856 * eta ** 3
-                  - 8453 / 15120 * np.log(2)
-                  + 26001 / 71680 * np.log(3)
-                  + 15943 / 645120 * np.log(tau)) * tau ** (-3 / 4)
-        term14 = (-250085444105408603 / 186891372173721600
-                  + 15943 / 80640 * np.euler_gamma
-                  + 7933513 / 66355200 * np.pi ** 2
-                  + (86796376850327 / 13484225986560 - 12751 / 49152 * np.pi ** 2) * eta
-                  - 5466199513 / 32105299968 * eta ** 2
-                  + 16786747 / 1146617856 * eta ** 3
-                  + 8453 / 15120 * np.log(2)
-                  - 26001 / 71680 * np.log(3)
-                  - 15943 / 645120 * np.log(tau_0)) * tau_0 ** (-3 / 4)
-
-        result = term1 * (1 + term2 + term3 + term4 + term5 + term6 + term7 + term8
-                          + term9 + term10 + term11 + term12 + term13 + term14)
-        return result
+        """3PN eccentricity evolution."""
+        t_ref = self.t_ref if tau_0 is None else None
+        if tau_0 is not None:
+            eta = gwtools.q_to_nu(q)
+            t_ref_from_tau0 = self.tc - tau_0 * 5 / eta
+            return PN3_e_t(t, e_0, q, tc=self.tc, t_ref=t_ref_from_tau0)
+        return PN3_e_t(t, e_0, q, tc=self.tc, t_ref=t_ref)
 
     # -------------------------------------------------------------------------
     # Fit functions
@@ -223,20 +171,16 @@ class ComputeEccentricityFromModulations:
         return PNorder_to_func_dict[order]
 
     def fit_func_2PN(self, t, e_0):
-        eta = gwtools.q_to_nu(self.q)
-        tau_0 = (self.tc - self.t_ref) * (eta / 5)
-        return self.PN_order2_e_t(t, e_0, self.q, tau_0)
+        return PN2_e_t(t, e_0, self.q, tc=self.tc, t_ref=self.t_ref)
 
     def fit_func_3PN(self, t, e_0):
-        eta = gwtools.q_to_nu(self.q)
-        tau_0 = (self.tc - self.t_ref) * (eta / 5)
-        return self.PN_e_t(t, e_0, self.q, tau_0)
+        return PN3_e_t(t, e_0, self.q, tc=self.tc, t_ref=self.t_ref)
 
     def fit_func_3PN_m1over8(self, t, e_0, A1):
         eta = gwtools.q_to_nu(self.q)
         tau = (self.tc - t) * (eta / 5)
         tau_0 = (self.tc - self.t_ref) * (eta / 5)
-        e_3PN = self.PN_e_t(t, e_0, self.q, tau_0)
+        e_3PN = PN3_e_t(t, e_0, self.q, tc=self.tc, t_ref=self.t_ref)
         e_m1over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A1 * (tau / tau_0) ** (-1 / 8)
         return e_3PN + e_m1over8
 
@@ -244,7 +188,7 @@ class ComputeEccentricityFromModulations:
         eta = gwtools.q_to_nu(self.q)
         tau = (self.tc - t) * (eta / 5)
         tau_0 = (self.tc - self.t_ref) * (eta / 5)
-        e_3PN = self.PN_e_t(t, e_0, self.q, tau_0)
+        e_3PN = PN3_e_t(t, e_0, self.q, tc=self.tc, t_ref=self.t_ref)
         e_m7over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A7 * (tau / tau_0) ** (-7 / 8)
         return e_3PN + e_m7over8
 
@@ -252,7 +196,7 @@ class ComputeEccentricityFromModulations:
         eta = gwtools.q_to_nu(self.q)
         tau = (self.tc - t) * (eta / 5)
         tau_0 = (self.tc - self.t_ref) * (eta / 5)
-        e_3PN = self.PN_e_t(t, e_0, self.q, tau_0)
+        e_3PN = PN3_e_t(t, e_0, self.q, tc=self.tc, t_ref=self.t_ref)
         e_m8over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A8 * (tau / tau_0) ** (-8 / 8)
         return e_3PN + e_m8over8
 
@@ -260,7 +204,7 @@ class ComputeEccentricityFromModulations:
         eta = gwtools.q_to_nu(self.q)
         tau = (self.tc - t) * (eta / 5)
         tau_0 = (self.tc - self.t_ref) * (eta / 5)
-        e_3PN = self.PN_e_t(t, e_0, self.q, tau_0)
+        e_3PN = PN3_e_t(t, e_0, self.q, tc=self.tc, t_ref=self.t_ref)
         e_m1over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A1 * (tau / tau_0) ** (-1 / 8)
         e_m8over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A8 * (tau / tau_0) ** (-1)
         return e_3PN + e_m1over8 + e_m8over8
@@ -269,7 +213,7 @@ class ComputeEccentricityFromModulations:
         eta = gwtools.q_to_nu(self.q)
         tau = (self.tc - t) * (eta / 5)
         tau_0 = (self.tc - self.t_ref) * (eta / 5)
-        e_3PN = self.PN_e_t(t, e_0, self.q, tau_0)
+        e_3PN = PN3_e_t(t, e_0, self.q, tc=self.tc, t_ref=self.t_ref)
         e_m1over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A1 * (tau / tau_0) ** (-1 / 8)
         e_m7over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A7 * (tau / tau_0) ** (-7 / 8)
         return e_3PN + e_m1over8 + e_m7over8
@@ -278,7 +222,7 @@ class ComputeEccentricityFromModulations:
         eta = gwtools.q_to_nu(self.q)
         tau = (self.tc - t) * (eta / 5)
         tau_0 = (self.tc - self.t_ref) * (eta / 5)
-        e_3PN = self.PN_e_t(t, e_0, self.q, tau_0)
+        e_3PN = PN3_e_t(t, e_0, self.q, tc=self.tc, t_ref=self.t_ref)
         e_m7over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A7 * (tau / tau_0) ** (-7 / 8)
         e_m8over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A8 * (tau / tau_0) ** (-1)
         return e_3PN + e_m7over8 + e_m8over8
@@ -287,7 +231,7 @@ class ComputeEccentricityFromModulations:
         eta = gwtools.q_to_nu(self.q)
         tau = (self.tc - t) * (eta / 5)
         tau_0 = (self.tc - self.t_ref) * (eta / 5)
-        e_3PN = self.PN_e_t(t, e_0, self.q, tau_0)
+        e_3PN = PN3_e_t(t, e_0, self.q, tc=self.tc, t_ref=self.t_ref)
         e_m1over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A1 * (tau / tau_0) ** (-1 / 8)
         e_m7over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A7 * (tau / tau_0) ** (-7 / 8)
         e_m8over8 = (e_0 * (tau / tau_0) ** (19 / 48)) * A8 * (tau / tau_0) ** (-1)
@@ -355,133 +299,35 @@ class ComputeEccentricityFromModulations:
         print('... gwModels eccentricity at t_ref=%.2f : %.5f' % (self.t_ref, self.ecc_ref))
 
     # -------------------------------------------------------------------------
-    # Plotting
+    # Plotting (delegate to standalone functions)
     # -------------------------------------------------------------------------
 
     def plot_xi(self, figsize=(8, 5)):
-        """Plot the modulation parameter xi."""
-        import matplotlib.pyplot as plt
-        plt.figure(figsize=figsize)
-        plt.plot(self.time_xi, self.modulations, color='C0', markersize=10, alpha=0.7)
-        plt.xlabel('Time', fontsize=15)
-        plt.ylabel('${\\xi}$', fontsize=18)
-        plt.xticks(fontsize=13)
-        plt.yticks(fontsize=13)
-        plt.show()
+        plotting.plot_xi(self, figsize)
 
     def plot_xi_with_peaks(self, figsize=(8, 5)):
-        """Plot xi with periastron and apastron peaks."""
-        import matplotlib.pyplot as plt
-        plt.figure(figsize=figsize)
-        plt.plot(self.time_xi, self.modulations, color='C0', markersize=10, alpha=0.7)
-        plt.plot(self.t_maximas, self.y_maximas, 'o', color='C0', markersize=10, alpha=0.5, label='Maximas')
-        plt.plot(self.t_minimas, -self.y_minimas, 's', color='C1', markersize=10, alpha=0.5, label='Minimas')
-        plt.xlabel('Time', fontsize=15)
-        plt.ylabel('${\\xi}$', fontsize=18)
-        plt.xticks(fontsize=13)
-        plt.yticks(fontsize=13)
-        plt.legend(fontsize=12)
-        plt.show()
+        plotting.plot_xi_with_peaks(self, figsize)
 
     def plot_maximas_fit(self, figsize=(8, 5)):
-        """Plot upper envelope fits."""
-        import matplotlib.pyplot as plt
-        plt.figure(figsize=figsize)
-        plt.plot(self.t_maximas, self.y_maximas, 'o', color='C0', markersize=10, alpha=0.5, label='Numerical')
-        plt.plot(self.time_xi, self.xi_upper, label='PN fit with $e_0=%.3f$' % self.popt_maximas[0], c='C0')
-        plt.xlabel('Time', fontsize=15)
-        plt.ylabel('$|{\\xi}_{\\rm upper}^{\\rm env}|$', fontsize=18)
-        plt.xticks(fontsize=13)
-        plt.yticks(fontsize=13)
-        plt.legend(fontsize=12)
-        plt.show()
+        plotting.plot_maximas_fit(self, figsize)
 
     def plot_minimas_fit(self, figsize=(8, 5)):
-        """Plot lower envelope fits."""
-        import matplotlib.pyplot as plt
-        plt.figure(figsize=figsize)
-        plt.plot(self.t_minimas, self.y_minimas, 's', color='C1', markersize=10, alpha=0.5, label='Numerical')
-        plt.plot(self.time_xi, self.xi_lower, label='PN fit with $e_0=%.3f$' % self.popt_minimas[0], c='C1')
-        plt.xlabel('Time', fontsize=15)
-        plt.ylabel('$|{\\xi}_{\\rm lower}^{\\rm env}|$', fontsize=18)
-        plt.xticks(fontsize=13)
-        plt.yticks(fontsize=13)
-        plt.legend(fontsize=12)
-        plt.show()
+        plotting.plot_minimas_fit(self, figsize)
 
     def plot_fit_errors(self, figsize=(8, 5)):
-        """Plot errors in upper and lower envelope fits."""
-        import matplotlib.pyplot as plt
-        plt.figure(figsize=figsize)
-        plt.plot(self.t_maximas, self.y_maximas - self.xi_upper_interp(self.t_maximas), 'o', markersize=4, label='Upper envelop')
-        plt.plot(self.t_minimas, self.y_minimas - self.xi_lower_interp(self.t_minimas), 's', markersize=4, label='Lower envelop')
-        plt.xlabel('Time', fontsize=15)
-        plt.ylabel('Fit errors', fontsize=18)
-        plt.xticks(fontsize=13)
-        plt.yticks(fontsize=13)
-        plt.legend(fontsize=12)
-        plt.show()
+        plotting.plot_fit_errors(self, figsize)
 
     def plot_xi_with_peaks_and_fits(self, figsize=(8, 5)):
-        """Plot xi with upper and lower envelope fits."""
-        import matplotlib.pyplot as plt
-        plt.figure(figsize=figsize)
-        plt.plot(self.time_xi, self.modulations, color='C0', markersize=10, alpha=0.7)
-        plt.plot(self.t_maximas, self.y_maximas, 'o', color='C0', markersize=10, alpha=0.5, label='Maximas')
-        plt.plot(self.t_minimas, -self.y_minimas, 's', color='C1', markersize=10, alpha=0.5, label='Minimas')
-        plt.plot(self.time_xi, self.xi_upper, label='PN fit with $e_0=%.3f$' % self.popt_maximas[0], c='C0')
-        plt.plot(self.time_xi, -self.xi_lower, label='PN fit with $e_0=%.3f$' % self.popt_minimas[0], c='C1')
-        plt.xlabel('Time', fontsize=15)
-        plt.ylabel('${\\xi}$', fontsize=18)
-        plt.xticks(fontsize=13)
-        plt.yticks(fontsize=13)
-        plt.legend(fontsize=12)
-        plt.show()
+        plotting.plot_xi_with_peaks_and_fits(self, figsize)
 
     def plot_maximas_and_minimas_fit(self, figsize=(8, 5)):
-        """Plot both upper and lower envelope fits."""
-        import matplotlib.pyplot as plt
-        plt.figure(figsize=figsize)
-        plt.plot(self.t_maximas, self.y_maximas, 'o', color='C0', markersize=10, alpha=0.5, label='$|{\\xi}_{\\rm upper}^{\\rm env}|$')
-        plt.plot(self.time_xi, self.xi_upper, label='PN fit with $e_0=%.3f$' % self.popt_maximas[0], c='C0')
-        plt.plot(self.t_minimas, self.y_minimas, 's', color='C1', markersize=10, alpha=0.5, label='$|{\\xi}_{\\rm lower}^{\\rm env}|$')
-        plt.plot(self.time_xi, self.xi_lower, label='PN fit with $e_0=%.3f$' % self.popt_minimas[0], c='C1')
-        plt.xlabel('Time', fontsize=15)
-        plt.ylabel('$|{\\xi}^{\\rm env}|$', fontsize=18)
-        plt.xticks(fontsize=13)
-        plt.yticks(fontsize=13)
-        plt.legend(fontsize=12)
-        plt.show()
+        plotting.plot_maximas_and_minimas_fit(self, figsize)
 
     def plot_maximas_minimas_and_avg_fit(self, figsize=(8, 5)):
-        """Plot upper, lower, and average envelope fits."""
-        import matplotlib.pyplot as plt
-        plt.figure(figsize=figsize)
-        plt.plot(self.t_maximas, self.y_maximas, 'o', color='C0', markersize=10, alpha=0.5, label='$|{\\xi}_{\\rm upper}^{\\rm env}|$')
-        plt.plot(self.time_xi, self.xi_upper, label='$|{\\xi}_{\\rm upper}^{\\rm env}|$ fit with $e_0=%.3f$' % self.popt_maximas[0], c='C0')
-        plt.plot(self.t_minimas, self.y_minimas, 's', color='C1', markersize=10, alpha=0.5, label='$|{\\xi}_{\\rm lower}^{\\rm env}|$')
-        plt.plot(self.time_xi, self.xi_lower, label='$|{\\xi}_{\\rm lower}^{\\rm env}|$ fit with $e_0=%.3f$' % self.popt_minimas[0], c='C1')
-        plt.plot(self.time_xi, self.xi_avg, label='$|{\\xi}_{\\rm avg}^{\\rm env}|$', c='k', ls='--')
-        plt.xlabel('Time', fontsize=15)
-        plt.ylabel('$|{\\xi}^{\\rm env}|$', fontsize=18)
-        plt.xticks(fontsize=13)
-        plt.yticks(fontsize=13)
-        plt.legend(fontsize=12)
-        plt.show()
+        plotting.plot_maximas_minimas_and_avg_fit(self, figsize)
 
     def plot_eccentricity(self, figsize=(8, 5)):
-        """Plot eccentricity evolution."""
-        import matplotlib.pyplot as plt
-        plt.figure(figsize=figsize)
-        plt.plot(self.time_xi, self.ecc_xi, c='C0', ls='-')
-        plt.axvline(x=self.t_ref, c='k', ls='--')
-        plt.text(self.t_ref + 10, self.ecc_ref * 0.5, '$e_{\\rm ref}$', fontsize=14, color='red', rotation=90)
-        plt.plot(self.t_ref, self.ecc_ref, 'o', color='red')
-        plt.xlabel('Time', fontsize=15)
-        plt.ylabel('$e_{\\xi}$', fontsize=18)
-        plt.xticks(fontsize=13)
-        plt.yticks(fontsize=13)
-        plt.show()
+        plotting.plot_eccentricity(self, figsize)
 
 
 class ComputeEccentricity:
@@ -489,14 +335,15 @@ class ComputeEccentricity:
     Class to compute eccentricity using 22 mode eccentric and circular waveforms.
 
     This is a convenience wrapper that:
-    1. Computes modulations via NRHME
+    1. Computes modulations via a framework class (NRHME or NRXHME)
     2. Delegates eccentricity extraction to ComputeEccentricityFromModulations
     """
     def __init__(self, t_ecc=None, h_ecc_dict=None, t_cir=None, h_cir_dict=None,
                  q=None, t_ref=None, ecc_prefactor=None, distance_btw_peaks=None,
                  fit_funcs_orders=None, include_zero_zero=False,
                  set_unphysical_xi_to_zero=False, set_unphysical_ecc_to_zero=True,
-                 method='xi_amp', use_xi_amp_to_get_xi_freq=False, tc=0, t_buffer=0):
+                 method='xi_amp', use_xi_amp_to_get_xi_freq=False, tc=0, t_buffer=0,
+                 framework_cls=None):
         """
         Parameters:
             t_ecc: time array for the eccentric 22 mode waveform
@@ -507,7 +354,13 @@ class ComputeEccentricity:
             t_ref: reference time to compute eccentricity
             ecc_prefactor: pre-factor in eccentricity definition; default is 2/3
             distance_btw_peaks: distance between peaks for PeakFinderScipy
-            fit_funcs_orders: orders of the upper and lower xi fit functions
+            fit_funcs_orders: list of two strings specifying the PN fit orders
+                              for the upper and lower xi envelopes, respectively.
+                              Available options: '2PN', '3PN', '3PN_m1over8',
+                              '3PN_m7over8', '3PN_m8over8', '3PN_m1over8_m8over8',
+                              '3PN_m1over8_m7over8', '3PN_m7over8_m8over8',
+                              '3PN_m1over8_m7over8_m8over8'.
+                              Default: ['3PN_m1over8', '3PN_m1over8']
             include_zero_zero: if True, include (t=0, y=0) to extrema lists
             set_unphysical_xi_to_zero: if True, set negative/NaN in fitted xi to zero
             set_unphysical_ecc_to_zero: if True, set negative/NaN in fitted eccentricity to zero
@@ -515,6 +368,8 @@ class ComputeEccentricity:
             use_xi_amp_to_get_xi_freq: if True, compute freq modulation from amp modulation
             tc: time at merger; default is zero
             t_buffer: buffer time for common time grid
+            framework_cls: framework class to use for modulation extraction.
+                           Default is NRHME (non-spinning). Use NRXHME for non-precessing.
         """
         if t_ecc is None:
             raise ValueError("t_ecc must be given as input")
@@ -527,6 +382,9 @@ class ComputeEccentricity:
         if q is None:
             raise ValueError("q must be given as input")
 
+        if framework_cls is None:
+            framework_cls = NRHME
+
         self.t_ecc = t_ecc
         self.h_ecc_dict = h_ecc_dict
         self.t_cir = t_cir
@@ -536,24 +394,21 @@ class ComputeEccentricity:
         self.use_xi_amp_to_get_xi_freq = use_xi_amp_to_get_xi_freq
 
         # Obtain modulations from eccentric and circular data
-        self.gwnrhme_obj = NRHME(t_ecc=self.t_ecc,
+        self.gwnrhme_obj = framework_cls(t_ecc=self.t_ecc,
                                  h_ecc_dict={'h_l2m2': self.h_ecc_dict['h_l2m2']},
                                  t_cir=self.t_cir,
                                  h_cir_dict={'h_l2m2': self.h_cir_dict['h_l2m2']},
                                  project_ecc_on_higher_modes=False,
                                  t_buffer=t_buffer)
 
-        # Amplitude-to-frequency modulation scaling
-        B = 0.9
-
         # Use only pre-merger data
         t_premerger = self.gwnrhme_obj.t_common[self.gwnrhme_obj.t_common <= 0]
 
         if self.method == 'xi_amp':
-            modulations_premerger = self.gwnrhme_obj.xi_amp[self.gwnrhme_obj.t_common <= 0] / B
+            modulations_premerger = self.gwnrhme_obj.xi_amp[self.gwnrhme_obj.t_common <= 0] / B_AMP_FREQ
         elif self.method == 'xi_freq':
             if self.use_xi_amp_to_get_xi_freq:
-                modulations_premerger = self.gwnrhme_obj.xi_amp[self.gwnrhme_obj.t_common <= 0] / B
+                modulations_premerger = self.gwnrhme_obj.xi_amp[self.gwnrhme_obj.t_common <= 0] / B_AMP_FREQ
             else:
                 modulations_premerger = self.gwnrhme_obj.xi_omega[self.gwnrhme_obj.t_common <= 0]
         else:

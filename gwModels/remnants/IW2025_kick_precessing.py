@@ -80,8 +80,8 @@ class gwModel_kick_prec_flow:
             samples: 1-D array of kick velocities in km/s
         """
         if a1 == 0 and a2 == 0:
-            from .IW_final_kick_aligned import gwModel_kick_q200
-            return np.full(num_samples, gwModel_kick_q200(q, a1, a2))
+            from .IW2025_kick_nonprecessing import gwModel_kick_q200
+            return np.full(num_samples, gwModel_kick_q200(q, chi1z=a1, chi2z=a2))
 
         contexts_raw = np.c_[np.log2(q), a1, a2]
         import torch

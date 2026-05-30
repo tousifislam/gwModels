@@ -13,14 +13,16 @@
 __author__ = "Tousif Islam"
 
 import numpy as np
+
 def symmetric_mass_ratio(q):
     """
-    Calculate symmetric mass ratio eta(q) with q = m2/m1 <= 1.
+    Calculate symmetric mass ratio eta(q) = q/(1+q)^2.
 
-    eta = 0.25 for equal masses (q = 1), eta -> 0 for q -> 0.
+    eta = 0.25 for equal masses (q = 1), eta -> 0 for q -> infinity.
+    The formula is symmetric under q -> 1/q, so works for any q > 0.
 
     Parameters:
-        q: Mass ratio (q <= 1).
+        q: Mass ratio q = m1/m2 >= 1.
 
     Returns:
         float or array: Symmetric mass ratio.

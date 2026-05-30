@@ -1,10 +1,10 @@
 Remnants
 ========
 
-Aligned-spin kick (Islam & Wadekar 2025)
------------------------------------------
+Non-precessing kick (Islam & Wadekar 2025)
+-------------------------------------------
 
-.. automodule:: gwModels.remnants.IW_final_kick_aligned
+.. automodule:: gwModels.remnants.IW2025_kick_nonprecessing
    :members:
    :undoc-members:
    :show-inheritance:
@@ -12,7 +12,7 @@ Aligned-spin kick (Islam & Wadekar 2025)
 GPR kick (Islam & Wadekar 2025)
 -------------------------------
 
-.. automodule:: gwModels.remnants.IW_final_kick_GPR
+.. automodule:: gwModels.remnants.IW2025_kick_gpr
    :members:
    :undoc-members:
    :show-inheritance:
@@ -20,7 +20,7 @@ GPR kick (Islam & Wadekar 2025)
 Precessing kick flow (Islam & Wadekar 2025)
 -------------------------------------------
 
-.. automodule:: gwModels.remnants.IW_final_kick_precessing
+.. automodule:: gwModels.remnants.IW2025_kick_precessing
    :members:
    :undoc-members:
    :show-inheritance:
@@ -28,7 +28,7 @@ Precessing kick flow (Islam & Wadekar 2025)
 HLZ kick
 --------
 
-.. automodule:: gwModels.remnants.HLZ_final_kick
+.. automodule:: gwModels.remnants.HLZ_kick
    :members:
    :undoc-members:
    :show-inheritance:
@@ -36,7 +36,7 @@ HLZ kick
 HBR final mass and spin
 ------------------------
 
-.. automodule:: gwModels.remnants.HBR_final_mass_final_spin
+.. automodule:: gwModels.remnants.HBR_mass_spin
    :members:
    :undoc-members:
    :show-inheritance:
@@ -44,7 +44,7 @@ HBR final mass and spin
 UIB2016 final mass and spin
 ---------------------------
 
-.. automodule:: gwModels.remnants.UIB2016_final_mass_final_spin
+.. automodule:: gwModels.remnants.UIB2016_mass_spin
    :members:
    :undoc-members:
    :show-inheritance:

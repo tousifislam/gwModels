@@ -15,6 +15,7 @@ import gwtools
 import scipy
 from ..utils.alignment import get_peak, AlignWFData, phase_align_dict, check_pi_rotation
 from ..utils.features import get_frequency
+from ..utils.constants import B_AMP_FREQ
 
 
 class BaseEccentricHM:
@@ -139,8 +140,7 @@ class BaseEccentricHM:
             cir_quadrupole_orbfreq = get_frequency(self.t_common, self.cir_wfobj.h_transform['h_l2m2'])
             return (ecc_quadrupole_orbfreq - cir_quadrupole_orbfreq) / cir_quadrupole_orbfreq
         else:
-            K = 0.9
-            return self.xi_amp * K
+            return self.xi_amp * B_AMP_FREQ
 
     def twist_mode_amplitude(self, mode):
         """

@@ -2,11 +2,11 @@
 #-*- coding: utf-8 -*-
 #==============================================================================
 #
-#    FILE: gwnrhme_models.py
+#    FILE: eccentric_hm.py
 #
 #    AUTHOR: Tousif Islam
 #    CREATED: 07-03-2024
-#    LAST MODIFIED: 05-28-2026
+#    LAST MODIFIED: 05-30-2026
 #    REVISION: ---
 #==============================================================================
 __author__ = "Tousif Islam"
@@ -15,9 +15,10 @@ import logging
 import warnings
 import numpy as np
 
-from .circular_models import genNRHybSur3dq8, genBHPTNRSur1dq1e4
-from .seob import genSEOBNRv5EHM
-from .lal_models import generate_IMRPhenomTHM
+from .externals.nrsur_models import genNRHybSur3dq8
+from .externals.bhpt_models import genBHPTNRSur1dq1e4
+from .externals.seob_models import genSEOBNRv5EHM
+from .externals.lal_models import generate_IMRPhenomTHM
 from ..frameworks.gwnrhme import NRHME
 from ..utils.features import get_frequency
 

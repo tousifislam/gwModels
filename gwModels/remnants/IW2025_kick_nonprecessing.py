@@ -2,7 +2,7 @@
 #-*- coding: utf-8 -*-
 #==============================================================================
 #
-#    FILE: IW_final_kick_aligned.py
+#    FILE: IW_final_kick_nonprecessing.py
 #
 #    Kick formula by Islam and Wadekar 2025 for aligned-spin binaries.
 #    From Islam & Wadekar (2025), https://arxiv.org/abs/2511.11536
@@ -65,12 +65,12 @@ _PARAMS_STD = {
 }
 
 
-def _compute_kick(q, s1z, s2z, params):
+def _compute_kick(q, chi1z, chi2z, params):
     eta = q / (1.0 + q)**2
     delta_m = (q - 1.0) / (q + 1.0)
 
-    S_tilde_par = (s1z + q**2 * s2z) / (1.0 + q)**2
-    Delta_tilde_par = (s1z - q * s2z) / (1.0 + q)
+    S_tilde_par = (chi1z + q**2 * chi2z) / (1.0 + q)**2
+    Delta_tilde_par = (chi1z - q * chi2z) / (1.0 + q)
 
     poly = (
         Delta_tilde_par
@@ -96,7 +96,7 @@ def _compute_kick(q, s1z, s2z, params):
     return V_kick
 
 
-def gwModel_kick_q200(q, s1z, s2z, return_std=False):
+def gwModel_kick_q200(q, chi1z, chi2z, return_std=False):
     """
     Kick velocity for aligned-spin binaries.
     From Islam & Wadekar (2025), https://arxiv.org/abs/2511.11536
@@ -106,8 +106,8 @@ def gwModel_kick_q200(q, s1z, s2z, return_std=False):
 
     Parameters:
         q: Mass ratio m1/m2 >= 1
-        s1z: Dimensionless spin of primary along z, in [-1, 1]
-        s2z: Dimensionless spin of secondary along z, in [-1, 1]
+        chi1z: Dimensionless spin of primary along z, in [-1, 1]
+        chi2z: Dimensionless spin of secondary along z, in [-1, 1]
         return_std: If True, also return parameter uncertainty estimate
 
     Returns:
@@ -115,22 +115,22 @@ def gwModel_kick_q200(q, s1z, s2z, return_std=False):
         V_kick_std (optional): Estimated uncertainty in km/s
     """
     q = np.asarray(q, dtype=float)
-    s1z = np.asarray(s1z, dtype=float)
-    s2z = np.asarray(s2z, dtype=float)
+    chi1z = np.asarray(chi1z, dtype=float)
+    chi2z = np.asarray(chi2z, dtype=float)
 
     if np.any(q < 1):
         raise ValueError("q must be >= 1 (m1/m2).")
-    if np.any((s1z < -1) | (s1z > 1) | (s2z < -1) | (s2z > 1)):
-        raise ValueError("s1z and s2z must be in [-1, 1].")
+    if np.any((chi1z < -1) | (chi1z > 1) | (chi2z < -1) | (chi2z > 1)):
+        raise ValueError("chi1z and chi2z must be in [-1, 1].")
 
-    V_kick = _compute_kick(q, s1z, s2z, _PARAMS_MEDIAN)
+    V_kick = _compute_kick(q, chi1z, chi2z, _PARAMS_MEDIAN)
 
     if return_std:
         variance = np.zeros_like(V_kick)
         for param_name in _PARAMS_MEDIAN:
             params_perturbed = _PARAMS_MEDIAN.copy()
             params_perturbed[param_name] = _PARAMS_MEDIAN[param_name] + _PARAMS_STD[param_name]
-            delta_V = _compute_kick(q, s1z, s2z, params_perturbed) - V_kick
+            delta_V = _compute_kick(q, chi1z, chi2z, params_perturbed) - V_kick
             variance += delta_V**2
         return V_kick, np.sqrt(variance)
 

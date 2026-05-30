@@ -14,24 +14,24 @@
 
 import numpy as np
 
-def bbh_UIBfits_setup(m1, m2, chi1, chi2):
+def _bbh_UIBfits_setup(m1, m2, chi1z, chi2z):
     """
     Common setup function for UIB final-state fit functions.
     """
     m1   = np.vectorize(float)(np.array(m1))
     m2   = np.vectorize(float)(np.array(m2))
-    chi1 = np.vectorize(float)(np.array(chi1))
-    chi2 = np.vectorize(float)(np.array(chi2))
+    chi1z = np.vectorize(float)(np.array(chi1z))
+    chi2z = np.vectorize(float)(np.array(chi2z))
 
     if np.any(m1<0):
       raise ValueError("m1 must not be negative")
     if np.any(m2<0):
       raise ValueError("m2 must not be negative")
 
-    if np.any(abs(chi1)>1):
-      raise ValueError("chi1 has to be in [-1, 1]")
-    if np.any(abs(chi2)>1):
-      raise ValueError("chi2 has to be in [-1, 1]")
+    if np.any(abs(chi1z)>1):
+      raise ValueError("chi1z has to be in [-1, 1]")
+    if np.any(abs(chi2z)>1):
+      raise ValueError("chi2z has to be in [-1, 1]")
 
     m    = m1+m2
     if np.any(m<=0):
@@ -51,15 +51,15 @@ def bbh_UIBfits_setup(m1, m2, chi1, chi2):
     eta3 = eta2*eta
     eta4 = eta2*eta2
 
-    S1    = chi1*m1sq/msq
-    S2    = chi2*m2sq/msq
+    S1    = chi1z*m1sq/msq
+    S2    = chi2z*m2sq/msq
     Stot  = S1+S2
-    Shat  = (chi1*m1sq+chi2*m2sq)/(m1sq+m2sq)
+    Shat  = (chi1z*m1sq+chi2z*m2sq)/(m1sq+m2sq)
     Shat2 = Shat*Shat
     Shat3 = Shat2*Shat
     Shat4 = Shat2*Shat2
 
-    chidiff  = chi1 - chi2
+    chidiff  = chi1z - chi2z
     if np.any(m2>m1):
       chidiff = np.sign(m1-m2)*chidiff
     chidiff2 = chidiff*chidiff
@@ -70,20 +70,23 @@ def bbh_UIBfits_setup(m1, m2, chi1, chi2):
 
     return m, eta, eta2, eta3, eta4, Stot, Shat, Shat2, Shat3, Shat4, chidiff, chidiff2, sqrt2, sqrt3, sqrt1m4eta
 
-def bbh_final_mass_non_precessing_UIB2016(m1, m2, chi1, chi2, version="v2"):
+def _bbh_final_mass_non_precessing(m1, m2, chi1z, chi2z, version="v2"):
     """
     Final mass with the aligned-spin NR fit by Jimenez Forteza, Keitel, Husa et al.
     [LIGO-P1600270] [https://arxiv.org/abs/1611.00332]
 
+    Takes component masses directly. For a q-based interface, use
+    bbh_final_mass_non_precessing_UIB2016.
+
     Parameters:
-        m1, m2: component masses (m1 > m2)
-        chi1, chi2: dimensionless spins of two BHs
+        m1, m2: component masses (m1 >= m2)
+        chi1z, chi2z: dimensionless spins of two BHs along z
         version: "v1" or "v2" (default "v2")
 
     Returns:
-        Mf: final mass
+        Mf: final mass (in same units as m1, m2)
     """
-    m, eta, eta2, eta3, eta4, Stot, Shat, Shat2, Shat3, Shat4, chidiff, chidiff2, sqrt2, sqrt3, sqrt1m4eta = bbh_UIBfits_setup(m1, m2, chi1, chi2)
+    m, eta, eta2, eta3, eta4, Stot, Shat, Shat2, Shat3, Shat4, chidiff, chidiff2, sqrt2, sqrt3, sqrt1m4eta = _bbh_UIBfits_setup(m1, m2, chi1z, chi2z)
 
     if version == "v1":
         b10 = 0.487
@@ -146,20 +149,23 @@ def bbh_final_mass_non_precessing_UIB2016(m1, m2, chi1, chi2, version="v2"):
 
     return Mf
 
-def bbh_final_spin_non_precessing_UIB2016(m1, m2, chi1, chi2, version="v2"):
+def _bbh_final_spin_non_precessing(m1, m2, chi1z, chi2z, version="v2"):
     """
     Final spin with the aligned-spin NR fit by Jimenez Forteza, Keitel, Husa et al.
     [LIGO-P1600270] [https://arxiv.org/abs/1611.00332]
 
+    Takes component masses directly. For a q-based interface, use
+    bbh_final_spin_non_precessing_UIB2016.
+
     Parameters:
-        m1, m2: component masses (m1 > m2)
-        chi1, chi2: dimensionless spins of two BHs
+        m1, m2: component masses (m1 >= m2)
+        chi1z, chi2z: dimensionless spins of two BHs along z
         version: "v1" or "v2" (default "v2")
 
     Returns:
-        chif: final spin
+        chif: final spin magnitude
     """
-    m, eta, eta2, eta3, eta4, Stot, Shat, Shat2, Shat3, Shat4, chidiff, chidiff2, sqrt2, sqrt3, sqrt1m4eta = bbh_UIBfits_setup(m1, m2, chi1, chi2)
+    m, eta, eta2, eta3, eta4, Stot, Shat, Shat2, Shat3, Shat4, chidiff, chidiff2, sqrt2, sqrt3, sqrt1m4eta = _bbh_UIBfits_setup(m1, m2, chi1z, chi2z)
 
     if version == "v1":
         a20 = 5.28
@@ -229,3 +235,37 @@ def bbh_final_spin_non_precessing_UIB2016(m1, m2, chi1, chi2, version="v2"):
     chif = Lorb + Stot
 
     return chif
+
+
+def bbh_final_mass_non_precessing_UIB2016(q, chi1z, chi2z, version="v2"):
+    """
+    Final mass fraction Mf/M using the UIB2016 fit, parameterized by mass ratio.
+
+    Parameters:
+        q: Mass ratio q = m1/m2 >= 1
+        chi1z, chi2z: Dimensionless spins along z in [-1, 1]
+        version: "v1" or "v2" (default "v2")
+
+    Returns:
+        Mf_over_M: Final mass as a fraction of total mass
+    """
+    m1 = q / (1.0 + q)
+    m2 = 1.0 / (1.0 + q)
+    return _bbh_final_mass_non_precessing(m1, m2, chi1z, chi2z, version=version)
+
+
+def bbh_final_spin_non_precessing_UIB2016(q, chi1z, chi2z, version="v2"):
+    """
+    Final spin using the UIB2016 fit, parameterized by mass ratio.
+
+    Parameters:
+        q: Mass ratio q = m1/m2 >= 1
+        chi1z, chi2z: Dimensionless spins along z in [-1, 1]
+        version: "v1" or "v2" (default "v2")
+
+    Returns:
+        chif: Final spin magnitude
+    """
+    m1 = q / (1.0 + q)
+    m2 = 1.0 / (1.0 + q)
+    return _bbh_final_spin_non_precessing(m1, m2, chi1z, chi2z, version=version)

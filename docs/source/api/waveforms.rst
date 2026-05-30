@@ -1,34 +1,45 @@
 Waveforms
 =========
 
-Circular models
----------------
+Eccentric higher-mode models
+-----------------------------
 
-.. automodule:: gwModels.waveforms.circular_models
+.. automodule:: gwModels.waveforms.eccentric_hm
    :members:
    :undoc-members:
    :show-inheritance:
 
-gwNRHME waveform models
------------------------
+External models
+---------------
 
-.. automodule:: gwModels.waveforms.gwnrhme_models
+NR surrogate models
+~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gwModels.waveforms.externals.nrsur_models
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+BHPT surrogate models
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gwModels.waveforms.externals.bhpt_models
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SEOB models
+~~~~~~~~~~~~
+
+.. automodule:: gwModels.waveforms.externals.seob_models
    :members:
    :undoc-members:
    :show-inheritance:
 
 LAL models
-----------
+~~~~~~~~~~~
 
-.. automodule:: gwModels.waveforms.lal_models
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-SEOBNRv5EHM
-------------
-
-.. automodule:: gwModels.waveforms.seob
+.. automodule:: gwModels.waveforms.externals.lal_models
    :members:
    :undoc-members:
    :show-inheritance:

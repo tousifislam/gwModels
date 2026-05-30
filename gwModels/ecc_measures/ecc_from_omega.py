@@ -2,7 +2,7 @@
 #-*- coding: utf-8 -*-
 #==============================================================================
 #
-#    FILE: compute_ecc_omega_ecc_gw.py
+#    FILE: ecc_from_omega.py
 #    Computes eccentricity given eccentric and circular waveforms or
 #    given eccentric modulations
 #
@@ -19,6 +19,7 @@ import gwtools
 from scipy import interpolate
 
 from ..utils.features import get_frequency
+from . import plotting
 
 logger = logging.getLogger(__name__)
 
@@ -110,35 +111,11 @@ class ComputeEccentricityFromOmega:
         print('... gwModels ecc_gw at t_ref=%.2f : %.5f' % (self.t_ref, self.ecc_gw_ref))
 
     # -------------------------------------------------------------------------
-    # Plotting
+    # Plotting (delegate to standalone functions)
     # -------------------------------------------------------------------------
 
     def plot_eccentricities(self, figsize=(8, 5)):
-        """Plot eccentricity evolutions."""
-        import matplotlib.pyplot as plt
-        plt.figure(figsize=figsize)
-        plt.plot(self.time_xi, self.ecc_omega22, c='C1', ls='-', label='$e_{\\omega_{22}}$')
-        plt.plot(self.time_xi, self.ecc_gw, c='C2', ls='-', label='$e_{\\rm gw}$')
-        plt.xlabel('Time', fontsize=15)
-        plt.ylabel('Eccentricities', fontsize=18)
-        plt.ylim(ymin=0)
-        plt.legend(fontsize=15)
-        plt.xticks(fontsize=13)
-        plt.yticks(fontsize=13)
-        plt.show()
+        plotting.plot_eccentricities_omega(self, figsize)
 
     def plot_omega_22_with_peaks_and_fits(self, figsize=(8, 5)):
-        """Plot eccentric omega 22 along with upper and lower envelope fits."""
-        import matplotlib.pyplot as plt
-        plt.figure(figsize=figsize)
-        plt.plot(self.time_xi, self.omega_22_ecc, color='C0', markersize=10, alpha=0.7, label='$\\omega_{22}^{\\rm ecc}$')
-        plt.plot(self.time_xi, self.omega_22_cir, color='C4', markersize=10, alpha=0.7, label='$\\omega_{22}^{\\rm cir}$')
-        plt.plot(self.time_xi, self.omega_22_p, color='C1', ls='--', markersize=10, alpha=0.7, label='$\\omega_{22}^{\\rm p}$')
-        plt.plot(self.time_xi, self.omega_22_a, color='C2', ls='-.', markersize=10, alpha=0.7, label='$\\omega_{22}^{\\rm a}$')
-        plt.xlabel('Time', fontsize=15)
-        plt.ylabel('${\\omega_{22}}$', fontsize=18)
-        plt.xticks(fontsize=13)
-        plt.yticks(fontsize=13)
-        plt.legend(fontsize=14)
-        plt.ylim(0, 0.022*np.pi*2)
-        plt.show()
+        plotting.plot_omega_22_with_envelopes(self, figsize)

@@ -6,7 +6,7 @@
 #
 #    AUTHOR: Tousif Islam
 #    CREATED: 08-11-2025
-#    LAST MODIFIED: 05-28-2026
+#    LAST MODIFIED: 05-30-2026
 #    REVISION: ---
 #==============================================================================
 __author__ = "Tousif Islam"
@@ -28,12 +28,12 @@ def angular_momentum_at_isco(a):
     r = kerr_isco_radius(a)
     return (2.0/(3.0*np.sqrt(3.0))) * (1.0 + 2.0*np.sqrt(3.0*r - 2.0))
 
-def angle_between_spins(theta1, theta2, deltaphi):
+def angle_between_spins(theta1, theta2, delta_phi):
     """
     Angle alpha between the two spin vectors using spherical law of cosines.
     """
     cos_alpha = (np.cos(theta1)*np.cos(theta2) +
-                 np.sin(theta1)*np.sin(theta2)*np.cos(deltaphi))
+                 np.sin(theta1)*np.sin(theta2)*np.cos(delta_phi))
     return np.arccos(np.clip(cos_alpha, -1.0, 1.0))
 
 def angle_correction(theta, eps):
@@ -42,14 +42,14 @@ def angle_correction(theta, eps):
     """
     return 2.0*np.arctan((1.0 + eps) * np.tan(0.5*theta))
 
-def bbh_final_mass_precessing_BMR2012(theta1, theta2, q, chi1, chi2, verbose=False):
+def bbh_final_mass_precessing_BMR2012(q, a1, a2, theta1, theta2, verbose=False):
     """
     Final remnant mass using Barausse-Morozova-Rezzolla (2012) fit.
 
     Parameters:
+        q: Mass ratio q = m1/m2 >= 1
+        a1, a2: Dimensionless spin magnitudes (0 <= a <= 1)
         theta1, theta2: Angles (radians) between orbital momentum and spins
-        q: Mass ratio m2/m1 with 0 <= q <= 1 (m1 >= m2)
-        chi1, chi2: Dimensionless spin magnitudes (0 <= chi <= 1)
         verbose: Print intermediate calculations (default: False)
 
     Returns:
@@ -60,12 +60,13 @@ def bbh_final_mass_precessing_BMR2012(theta1, theta2, q, chi1, chi2, verbose=Fal
     theta1 = np.asarray(theta1, dtype=float)
     theta2 = np.asarray(theta2, dtype=float)
     q = np.asarray(q, dtype=float)
-    chi1 = np.asarray(chi1, dtype=float)
-    chi2 = np.asarray(chi2, dtype=float)
+    a1 = np.asarray(a1, dtype=float)
+    a2 = np.asarray(a2, dtype=float)
 
-    eta = symmetric_mass_ratio(q)
+    small_q = 1.0 / q
+    eta = symmetric_mass_ratio(small_q)
 
-    a_tilde = (chi1*np.cos(theta1) + (q**2)*chi2*np.cos(theta2)) / (1.0 + q)**2
+    a_tilde = (a1*np.cos(theta1) + (small_q**2)*a2*np.cos(theta2)) / (1.0 + small_q)**2
 
     E_isco = energy_at_isco(a_tilde)
 
@@ -80,16 +81,16 @@ def bbh_final_mass_precessing_BMR2012(theta1, theta2, q, chi1, chi2, verbose=Fal
 
     return M_fin
 
-def bbh_final_spin_precessing_HBR2016(theta1, theta2, deltaphi, q, chi1, chi2,
+def bbh_final_spin_precessing_HBR2016(q, a1, a2, theta1, theta2, delta_phi,
                        model="HBR16_34corr", verbose=False):
     """
     Final spin magnitude using Hofmann, Barausse & Rezzolla (2016) fit.
 
     Parameters:
+        q: Mass ratio q = m1/m2 >= 1
+        a1, a2: Dimensionless spin magnitudes (0 <= a <= 1)
         theta1, theta2: Angles (radians) between orbital momentum and spins
-        deltaphi: Angle between spin projections on orbital plane
-        q: Mass ratio m2/m1 with 0 <= q <= 1 (m1 >= m2)
-        chi1, chi2: Dimensionless spin magnitudes (0 <= chi <= 1)
+        delta_phi: Angle between spin projections on orbital plane
         model: Fit model selection (default: "HBR16_34corr")
         verbose: Print intermediate calculations
 
@@ -100,12 +101,13 @@ def bbh_final_spin_precessing_HBR2016(theta1, theta2, deltaphi, q, chi1, chi2,
     """
     theta1 = np.asarray(theta1, dtype=float)
     theta2 = np.asarray(theta2, dtype=float)
-    deltaphi = np.asarray(deltaphi, dtype=float)
+    delta_phi = np.asarray(delta_phi, dtype=float)
     q = np.asarray(q, dtype=float)
-    chi1 = np.asarray(chi1, dtype=float)
-    chi2 = np.asarray(chi2, dtype=float)
+    a1 = np.asarray(a1, dtype=float)
+    a2 = np.asarray(a2, dtype=float)
 
-    eta = symmetric_mass_ratio(q)
+    small_q = 1.0 / q
+    eta = symmetric_mass_ratio(small_q)
 
     coefficient_sets = {
         "HBR16_12": {
@@ -155,7 +157,7 @@ def bbh_final_spin_precessing_HBR2016(theta1, theta2, deltaphi, q, chi1, chi2,
     eps2 = 0.024 if use_corrections else 0.0
     eps12 = 0.0
 
-    alpha = angle_between_spins(theta1, theta2, deltaphi)
+    alpha = angle_between_spins(theta1, theta2, delta_phi)
     beta = theta1
     gamma = theta2
 
@@ -163,8 +165,8 @@ def bbh_final_spin_precessing_HBR2016(theta1, theta2, deltaphi, q, chi1, chi2,
     beta_corrected = angle_correction(beta, eps1)
     gamma_corrected = angle_correction(gamma, eps2)
 
-    a_tot = (chi1*np.cos(beta_corrected) + (q**2)*chi2*np.cos(gamma_corrected)) / (1.0 + q)**2
-    a_eff = a_tot + xi*eta*(chi1*np.cos(beta_corrected) + chi2*np.cos(gamma_corrected))
+    a_tot = (a1*np.cos(beta_corrected) + (small_q**2)*a2*np.cos(gamma_corrected)) / (1.0 + small_q)**2
+    a_eff = a_tot + xi*eta*(a1*np.cos(beta_corrected) + a2*np.cos(gamma_corrected))
     a_eff = np.clip(a_eff, -1.0, 1.0)
 
     E_isco = energy_at_isco(a_eff)
@@ -180,11 +182,11 @@ def bbh_final_spin_precessing_HBR2016(theta1, theta2, deltaphi, q, chi1, chi2,
 
     ell = np.abs(L_isco - 2.0*a_tot*(E_isco - 1.0) + correction_sum)
 
-    term1 = chi1**2 + (chi2**2)*(q**4) + 2.0*chi1*chi2*(q**2)*np.cos(alpha_corrected)
-    term2 = 2.0*(chi1*np.cos(beta_corrected) + chi2*(q**2)*np.cos(gamma_corrected)) * ell * q
-    term3 = (ell*q)**2
+    term1 = a1**2 + (a2**2)*(small_q**4) + 2.0*a1*a2*(small_q**2)*np.cos(alpha_corrected)
+    term2 = 2.0*(a1*np.cos(beta_corrected) + a2*(small_q**2)*np.cos(gamma_corrected)) * ell * small_q
+    term3 = (ell*small_q)**2
 
-    chi_final = np.sqrt(term1 + term2 + term3) / (1.0 + q)**2
+    chi_final = np.sqrt(term1 + term2 + term3) / (1.0 + small_q)**2
 
     chi_final = np.minimum(chi_final, 1.0)
 

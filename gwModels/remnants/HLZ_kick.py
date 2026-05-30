@@ -6,7 +6,7 @@
 #
 #    AUTHOR: Tousif Islam
 #    CREATED: 08-11-2025
-#    LAST MODIFIED: 05-28-2026
+#    LAST MODIFIED: 05-30-2026
 #    REVISION: ---
 #==============================================================================
 __author__ = "Tousif Islam"
@@ -31,57 +31,57 @@ C2 = 1140.0    # km/s
 C3 = 2481.0    # km/s
 XI_ANGLE = np.radians(145.0)  # angle between kick components (radians)
 
-def spin_difference_vector(theta1, theta2, deltaphi, q, chi1, chi2):
+def spin_difference_vector(small_q, a1, a2, theta1, theta2, delta_phi):
     """
     Calculate the antisymmetric spin combination Delta = (S2/m2 - S1/m1)/(1+q).
 
     Parameters:
+        small_q: mass ratio m2/m1 <= 1 (internal convention)
+        a1, a2: dimensionless spin magnitudes
         theta1, theta2: angles between L and spin vectors (radians)
-        deltaphi: azimuthal angle difference between spins (radians)
-        q: mass ratio (q <= 1)
-        chi1, chi2: spin magnitudes
+        delta_phi: azimuthal angle difference between spins (radians)
 
     Returns:
         Delta_parallel, Delta_perp
     """
-    Delta_parallel = abs((chi1 * np.cos(theta1) - q * chi2 * np.cos(theta2)) / (1 + q))
+    Delta_parallel = abs((a1 * np.cos(theta1) - small_q * a2 * np.cos(theta2)) / (1 + small_q))
 
-    Delta_perp_sq = (chi1**2 * np.sin(theta1)**2 + q**2 * chi2**2 * np.sin(theta2)**2
-                    - 2 * q * chi1 * chi2 * np.sin(theta1) * np.sin(theta2) * np.cos(deltaphi)) / (1 + q)**2
+    Delta_perp_sq = (a1**2 * np.sin(theta1)**2 + small_q**2 * a2**2 * np.sin(theta2)**2
+                    - 2 * small_q * a1 * a2 * np.sin(theta1) * np.sin(theta2) * np.cos(delta_phi)) / (1 + small_q)**2
     Delta_perp = np.sqrt(np.maximum(0, Delta_perp_sq))
 
     return Delta_parallel, Delta_perp
 
-def total_spin_vector(theta1, theta2, deltaphi, q, chi1, chi2):
+def total_spin_vector(small_q, a1, a2, theta1, theta2, delta_phi):
     """
     Calculate the symmetric spin combination chi = (S1 + S2)/M^2.
 
     Parameters:
+        small_q: mass ratio m2/m1 <= 1 (internal convention)
+        a1, a2: dimensionless spin magnitudes
         theta1, theta2: angles between L and spin vectors (radians)
-        deltaphi: azimuthal angle difference between spins (radians)
-        q: mass ratio (q <= 1)
-        chi1, chi2: spin magnitudes
+        delta_phi: azimuthal angle difference between spins (radians)
 
     Returns:
         chi_tilde_parallel, chi_tilde_perp
     """
-    chi_tilde_parallel = (chi1 * np.cos(theta1) + q**2 * chi2 * np.cos(theta2)) / (1 + q)**2
+    chi_tilde_parallel = (a1 * np.cos(theta1) + small_q**2 * a2 * np.cos(theta2)) / (1 + small_q)**2
 
-    chi_tilde_perp_sq = (chi1**2 * np.sin(theta1)**2 + q**4 * chi2**2 * np.sin(theta2)**2
-                        + 2 * q**2 * chi1 * chi2 * np.sin(theta1) * np.sin(theta2) * np.cos(deltaphi)) / (1 + q)**4
+    chi_tilde_perp_sq = (a1**2 * np.sin(theta1)**2 + small_q**4 * a2**2 * np.sin(theta2)**2
+                        + 2 * small_q**2 * a1 * a2 * np.sin(theta1) * np.sin(theta2) * np.cos(delta_phi)) / (1 + small_q)**4
     chi_tilde_perp = np.sqrt(np.maximum(0, chi_tilde_perp_sq))
 
     return chi_tilde_parallel, chi_tilde_perp
 
-def calculate_kick_components(q, chi1, chi2, theta1, theta2, deltaphi, Theta=None):
+def calculate_kick_components(small_q, a1, a2, theta1, theta2, delta_phi, Theta=None):
     """
     Calculate the three kick velocity components.
 
     Parameters:
-        q: mass ratio (q <= 1)
-        chi1, chi2: spin magnitudes
+        small_q: mass ratio m2/m1 <= 1 (internal convention)
+        a1, a2: dimensionless spin magnitudes
         theta1, theta2: angles between L and spin vectors (radians)
-        deltaphi: azimuthal angle difference between spins (radians)
+        delta_phi: azimuthal angle difference between spins (radians)
         Theta: angle between Delta x L and fiducial infall direction (radians).
                If None, a random value between 0 and 2pi is used.
 
@@ -92,12 +92,12 @@ def calculate_kick_components(q, chi1, chi2, theta1, theta2, deltaphi, Theta=Non
     if Theta is None:
         Theta = np.random.uniform(0, 2*np.pi)
 
-    eta = q / (1 + q)**2
+    eta = small_q / (1 + small_q)**2
 
-    Delta_parallel, Delta_perp = spin_difference_vector(theta1, theta2, deltaphi, q, chi1, chi2)
-    chi_tilde_parallel, chi_tilde_perp = total_spin_vector(theta1, theta2, deltaphi, q, chi1, chi2)
+    Delta_parallel, Delta_perp = spin_difference_vector(small_q, a1, a2, theta1, theta2, delta_phi)
+    chi_tilde_parallel, chi_tilde_perp = total_spin_vector(small_q, a1, a2, theta1, theta2, delta_phi)
 
-    Vm = A * eta**2 * (1 - q) / (1 + q) * (1 + B * eta)
+    Vm = A * eta**2 * (1 - small_q) / (1 + small_q) * (1 + B * eta)
 
     Vs_perp = H * eta**2 * Delta_parallel
 
@@ -108,16 +108,16 @@ def calculate_kick_components(q, chi1, chi2, theta1, theta2, deltaphi, Theta=Non
 
     return Vm, Vs_perp, Vs_parallel, Theta
 
-def bbh_final_kick_precessing_CLZM2007(q, chi1, chi2, theta1, theta2, deltaphi, Theta=None,
+def bbh_final_kick_precessing_CLZM2007(q, a1, a2, theta1, theta2, delta_phi, Theta=None,
                                        debug=False):
     """
     Calculate total kick velocity magnitude.
 
     Parameters:
-        q: mass ratio (q <= 1)
-        chi1, chi2: spin magnitudes
+        q: mass ratio q = m1/m2 >= 1
+        a1, a2: dimensionless spin magnitudes
         theta1, theta2: angles between L and spin vectors (radians)
-        deltaphi: azimuthal angle difference between spins (radians)
+        delta_phi: azimuthal angle difference between spins (radians)
         Theta: angle between Delta x L and fiducial infall direction (radians).
                If None, a random value between 0 and 2pi is used.
         debug: if True, return all components
@@ -126,8 +126,10 @@ def bbh_final_kick_precessing_CLZM2007(q, chi1, chi2, theta1, theta2, deltaphi, 
         V_kick (float): total kick velocity in km/s
         If debug=True: V_kick, Vm, Vs_perp, Vs_parallel, Theta_used
     """
+    small_q = 1.0 / q
+
     Vm, Vs_perp, Vs_parallel, used_Theta = calculate_kick_components(
-        q, chi1, chi2, theta1, theta2, deltaphi, Theta)
+        small_q, a1, a2, theta1, theta2, delta_phi, Theta)
 
     V_kick = np.sqrt(Vm**2 + 2*Vm*Vs_perp*np.cos(XI_ANGLE) + Vs_perp**2 + Vs_parallel**2)
 
@@ -136,15 +138,15 @@ def bbh_final_kick_precessing_CLZM2007(q, chi1, chi2, theta1, theta2, deltaphi, 
     else:
         return V_kick
 
-def HLZ_2014_aligned_spin(q, s1z, s2z):
+def bbh_final_kick_nonprecessing_HLZ2014(q, chi1z, chi2z):
     """
     RIT aligned-spin recoil (kick) for binaries with spins along +/-z.
     Coefficients from arXiv:1406.7295.
 
     Parameters:
-        q: mass ratio m1/m2 >= 1 (primary is m1)
-        s1z: dimensionless spin of primary along z in [-1, 1]
-        s2z: dimensionless spin of secondary along z in [-1, 1]
+        q: mass ratio q = m1/m2 >= 1
+        chi1z: dimensionless spin of primary along z in [-1, 1]
+        chi2z: dimensionless spin of secondary along z in [-1, 1]
 
     Returns:
         V_kick: kick velocity in km/s
@@ -170,14 +172,14 @@ def HLZ_2014_aligned_spin(q, s1z, s2z):
     c_deg = 54.0
 
     q = np.asarray(q, dtype=float)
-    s1z = np.asarray(s1z, dtype=float)
-    s2z = np.asarray(s2z, dtype=float)
+    chi1z = np.asarray(chi1z, dtype=float)
+    chi2z = np.asarray(chi2z, dtype=float)
 
     eta = q / (1.0 + q)**2
     delta_m = (q - 1.0) / (q + 1.0)
 
-    S_tilde_par = (s1z + q**2 * s2z) / (1.0 + q)**2
-    Delta_tilde_par = (s1z - q * s2z) / (1.0 + q)
+    S_tilde_par = (chi1z + q**2 * chi2z) / (1.0 + q)**2
+    Delta_tilde_par = (chi1z - q * chi2z) / (1.0 + q)
 
     poly = (
         Delta_tilde_par
