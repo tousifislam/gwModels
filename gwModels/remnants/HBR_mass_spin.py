@@ -55,7 +55,7 @@ def bbh_final_mass_precessing_BMR2012(q, a1, a2, theta1, theta2, verbose=False):
     Returns:
         Mfin: Remnant mass as fraction of initial total mass M_f/M
 
-    Reference: Barausse, Morozova & Rezzolla (2012), ApJ 758, 63
+    Reference: Barausse, Morozova & Rezzolla (2012), ApJ 758, 63, arXiv:1206.3803
     """
     q = validate_q(q)
     a1, a2 = validate_spin_magnitudes(a1, a2)
@@ -96,7 +96,7 @@ def bbh_final_spin_precessing_HBR2016(q, a1, a2, theta1, theta2, delta_phi,
     Returns:
         chi_final: Final spin magnitude |a_final| <= 1
 
-    Reference: Hofmann, Barausse & Rezzolla (2016), ApJL 825, L19
+    Reference: Hofmann, Barausse & Rezzolla (2016), ApJL 825, L19, arXiv:1605.01938
     """
     q = validate_q(q)
     a1, a2 = validate_spin_magnitudes(a1, a2)
