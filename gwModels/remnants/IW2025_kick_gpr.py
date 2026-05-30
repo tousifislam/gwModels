@@ -18,6 +18,7 @@
 #==============================================================================
 __author__ = "Tousif Islam"
 
+import warnings
 import numpy as np
 import pickle
 
@@ -38,8 +39,11 @@ class gwModel_kick_q200_GPR:
     """
 
     def __init__(self, model_path):
-        with open(model_path, 'rb') as f:
-            data = pickle.load(f)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=UserWarning, message=".*InconsistentVersionWarning.*")
+            warnings.filterwarnings("ignore", message=".*Trying to unpickle.*")
+            with open(model_path, 'rb') as f:
+                data = pickle.load(f)
         self._gpr = data['gpr_model']
         self._scaler_X = data['scaler_X']
         self._scaler_y = data['scaler_y']
