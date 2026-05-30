@@ -6,3 +6,6 @@ __pycache__/
 .h5
 .json
 docs/build/
+*.egg-info/
+dist/
+.DS_Store
