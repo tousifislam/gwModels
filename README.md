@@ -15,6 +15,22 @@
 ## **gwModels**
 This package is intended to host a variety of data-driven and phenomenological models for the gravitational radiation (waveforms) emitted from binary black hole mergers. For questions, suggestions or collaborations, please feel free to drop an email to tousifislam24@gmail.com. Detailed documentation is available at https://tousifislam.com/gwModels/
 
+## Conventions
+
+Throughout the package, we adopt the following conventions for binary black hole parameters:
+
+| Symbol | Description | Range |
+|--------|-------------|-------|
+| `q` | Mass ratio $m_1/m_2$ (body 1 is always the more massive) | $q \geq 1$ |
+| `a1`, `a2` | Dimensionless spin magnitudes | $[0, 1]$ |
+| `chi1`, `chi2` | Dimensionless spin vectors `[chi1x, chi1y, chi1z]` | — |
+| `chi1z`, `chi2z` | Spin components along orbital angular momentum | $[-1, 1]$ |
+| `theta1`, `theta2` | Zenith angle between spin and orbital angular momentum | — |
+| `phi1`, `phi2` | Azimuthal angle of spin projection onto the orbital plane | — |
+| `delta_phi` | Azimuthal angle difference between spin projections | — |
+| `e_ref` | Eccentricity at reference | — |
+| `ano_ref` | Anomaly at reference | — |
+
 ## Getting the package
 
 ### From PyPI
