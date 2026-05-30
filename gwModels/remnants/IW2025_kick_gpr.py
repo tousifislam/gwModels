@@ -21,6 +21,7 @@ __author__ = "Tousif Islam"
 import warnings
 import numpy as np
 import pickle
+from .remnant_utils import validate_q, validate_spin_z
 
 
 class gwModel_kick_q200_GPR:
@@ -61,9 +62,10 @@ class gwModel_kick_q200_GPR:
             vk: Kick velocity in km/s
             vk_std: GPR uncertainty in km/s
         """
-        q = np.atleast_1d(np.asarray(q, dtype=float))
-        chi1z = np.atleast_1d(np.asarray(chi1z, dtype=float))
-        chi2z = np.atleast_1d(np.asarray(chi2z, dtype=float))
+        q = np.atleast_1d(validate_q(q))
+        chi1z, chi2z = validate_spin_z(chi1z, chi2z)
+        chi1z = np.atleast_1d(chi1z)
+        chi2z = np.atleast_1d(chi2z)
 
         eta = q / (1 + q)**2
         chi_eff = (q * chi1z + chi2z) / (1 + q)

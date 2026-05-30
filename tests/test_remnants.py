@@ -42,7 +42,7 @@ class TestIWKickAligned:
             gwModels.remnants.gwModel_kick_q200(0.5, 0.0, 0.0)
 
     def test_spin_out_of_range_raises(self):
-        with pytest.raises(ValueError, match="chi1z and chi2z"):
+        with pytest.raises(ValueError, match="chi1z must be in"):
             gwModels.remnants.gwModel_kick_q200(2.0, 1.5, 0.0)
 
     def test_kick_positive(self):

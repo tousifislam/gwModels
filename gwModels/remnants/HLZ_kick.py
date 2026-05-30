@@ -12,6 +12,7 @@
 __author__ = "Tousif Islam"
 
 import numpy as np
+from .remnant_utils import validate_q, validate_spin_magnitudes, validate_spin_z
 
 # Fitting coefficients from the literature
 # Gonzalez et al. (2007b),
@@ -126,6 +127,9 @@ def bbh_final_kick_precessing_CLZM2007(q, a1, a2, theta1, theta2, delta_phi, The
         V_kick (float): total kick velocity in km/s
         If debug=True: V_kick, Vm, Vs_perp, Vs_parallel, Theta_used
     """
+    validate_q(q)
+    validate_spin_magnitudes(a1, a2)
+
     small_q = 1.0 / q
 
     Vm, Vs_perp, Vs_parallel, used_Theta = calculate_kick_components(
@@ -151,6 +155,9 @@ def bbh_final_kick_nonprecessing_HLZ2014(q, chi1z, chi2z):
     Returns:
         V_kick: kick velocity in km/s
     """
+    q = validate_q(q)
+    chi1z, chi2z = validate_spin_z(chi1z, chi2z)
+
     _A = 1.2e4
     _B = -0.93
     _H = 6.9e3
@@ -170,10 +177,6 @@ def bbh_final_kick_nonprecessing_HLZ2014(q, chi1z, chi2z):
     a_deg = 145.0
     b_deg = -7.2
     c_deg = 54.0
-
-    q = np.asarray(q, dtype=float)
-    chi1z = np.asarray(chi1z, dtype=float)
-    chi2z = np.asarray(chi2z, dtype=float)
 
     eta = q / (1.0 + q)**2
     delta_m = (q - 1.0) / (q + 1.0)

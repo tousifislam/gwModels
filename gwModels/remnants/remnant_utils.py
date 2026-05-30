@@ -14,6 +14,36 @@ __author__ = "Tousif Islam"
 
 import numpy as np
 
+def validate_q(q):
+    """Validate that q = m1/m2 >= 1."""
+    q = np.asarray(q, dtype=float)
+    if np.any(q < 1):
+        raise ValueError("q must be >= 1 (m1/m2).")
+    return q
+
+
+def validate_spin_magnitudes(a1, a2):
+    """Validate that spin magnitudes are in [0, 1]."""
+    a1 = np.asarray(a1, dtype=float)
+    a2 = np.asarray(a2, dtype=float)
+    if np.any((a1 < 0) | (a1 > 1)):
+        raise ValueError("a1 must be in [0, 1].")
+    if np.any((a2 < 0) | (a2 > 1)):
+        raise ValueError("a2 must be in [0, 1].")
+    return a1, a2
+
+
+def validate_spin_z(chi1z, chi2z):
+    """Validate that spin z-components are in [-1, 1]."""
+    chi1z = np.asarray(chi1z, dtype=float)
+    chi2z = np.asarray(chi2z, dtype=float)
+    if np.any((chi1z < -1) | (chi1z > 1)):
+        raise ValueError("chi1z must be in [-1, 1].")
+    if np.any((chi2z < -1) | (chi2z > 1)):
+        raise ValueError("chi2z must be in [-1, 1].")
+    return chi1z, chi2z
+
+
 def symmetric_mass_ratio(q):
     """
     Calculate symmetric mass ratio eta(q) = q/(1+q)^2.

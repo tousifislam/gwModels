@@ -13,6 +13,7 @@
 #==============================================================================
 
 import numpy as np
+from .remnant_utils import validate_q, validate_spin_z
 
 def _bbh_UIBfits_setup(m1, m2, chi1z, chi2z):
     """
@@ -249,6 +250,8 @@ def bbh_final_mass_non_precessing_UIB2016(q, chi1z, chi2z, version="v2"):
     Returns:
         Mf_over_M: Final mass as a fraction of total mass
     """
+    q = validate_q(q)
+    chi1z, chi2z = validate_spin_z(chi1z, chi2z)
     m1 = q / (1.0 + q)
     m2 = 1.0 / (1.0 + q)
     return _bbh_final_mass_non_precessing(m1, m2, chi1z, chi2z, version=version)
@@ -266,6 +269,8 @@ def bbh_final_spin_non_precessing_UIB2016(q, chi1z, chi2z, version="v2"):
     Returns:
         chif: Final spin magnitude
     """
+    q = validate_q(q)
+    chi1z, chi2z = validate_spin_z(chi1z, chi2z)
     m1 = q / (1.0 + q)
     m2 = 1.0 / (1.0 + q)
     return _bbh_final_spin_non_precessing(m1, m2, chi1z, chi2z, version=version)

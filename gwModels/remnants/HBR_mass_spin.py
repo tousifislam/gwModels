@@ -12,7 +12,7 @@
 __author__ = "Tousif Islam"
 
 import numpy as np
-from .remnant_utils import symmetric_mass_ratio, kerr_isco_radius
+from .remnant_utils import symmetric_mass_ratio, kerr_isco_radius, validate_q, validate_spin_magnitudes
 
 def energy_at_isco(a):
     """
@@ -57,11 +57,10 @@ def bbh_final_mass_precessing_BMR2012(q, a1, a2, theta1, theta2, verbose=False):
 
     Reference: Barausse, Morozova & Rezzolla (2012), ApJ 758, 63
     """
+    q = validate_q(q)
+    a1, a2 = validate_spin_magnitudes(a1, a2)
     theta1 = np.asarray(theta1, dtype=float)
     theta2 = np.asarray(theta2, dtype=float)
-    q = np.asarray(q, dtype=float)
-    a1 = np.asarray(a1, dtype=float)
-    a2 = np.asarray(a2, dtype=float)
 
     small_q = 1.0 / q
     eta = symmetric_mass_ratio(small_q)
@@ -99,12 +98,11 @@ def bbh_final_spin_precessing_HBR2016(q, a1, a2, theta1, theta2, delta_phi,
 
     Reference: Hofmann, Barausse & Rezzolla (2016), ApJL 825, L19
     """
+    q = validate_q(q)
+    a1, a2 = validate_spin_magnitudes(a1, a2)
     theta1 = np.asarray(theta1, dtype=float)
     theta2 = np.asarray(theta2, dtype=float)
     delta_phi = np.asarray(delta_phi, dtype=float)
-    q = np.asarray(q, dtype=float)
-    a1 = np.asarray(a1, dtype=float)
-    a2 = np.asarray(a2, dtype=float)
 
     small_q = 1.0 / q
     eta = symmetric_mass_ratio(small_q)

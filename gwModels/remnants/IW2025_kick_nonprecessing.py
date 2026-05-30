@@ -17,6 +17,7 @@
 __author__ = "Tousif Islam"
 
 import numpy as np
+from .remnant_utils import validate_q, validate_spin_z
 
 # Fitted parameters (median/best-fit values)
 _PARAMS_MEDIAN = {
@@ -114,14 +115,8 @@ def gwModel_kick_q200(q, chi1z, chi2z, return_std=False):
         V_kick: Kick velocity in km/s
         V_kick_std (optional): Estimated uncertainty in km/s
     """
-    q = np.asarray(q, dtype=float)
-    chi1z = np.asarray(chi1z, dtype=float)
-    chi2z = np.asarray(chi2z, dtype=float)
-
-    if np.any(q < 1):
-        raise ValueError("q must be >= 1 (m1/m2).")
-    if np.any((chi1z < -1) | (chi1z > 1) | (chi2z < -1) | (chi2z > 1)):
-        raise ValueError("chi1z and chi2z must be in [-1, 1].")
+    q = validate_q(q)
+    chi1z, chi2z = validate_spin_z(chi1z, chi2z)
 
     V_kick = _compute_kick(q, chi1z, chi2z, _PARAMS_MEDIAN)
 

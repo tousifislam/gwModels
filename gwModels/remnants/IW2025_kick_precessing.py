@@ -19,6 +19,7 @@
 __author__ = "Tousif Islam"
 
 import numpy as np
+from .remnant_utils import validate_q, validate_spin_magnitudes
 
 
 def _build_flow(d_in=3, d_hidden=16, d_context=2, n_layers=4):
@@ -79,6 +80,9 @@ class gwModel_kick_prec_flow:
         Returns:
             samples: 1-D array of kick velocities in km/s
         """
+        validate_q(q)
+        validate_spin_magnitudes(a1, a2)
+
         if a1 == 0 and a2 == 0:
             from .IW2025_kick_nonprecessing import gwModel_kick_q200
             return np.full(num_samples, gwModel_kick_q200(q, chi1z=a1, chi2z=a2))
