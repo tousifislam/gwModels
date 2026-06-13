@@ -96,6 +96,57 @@ class TestIWKickPrecessing:
         samples = flow_model.sample(q=2, a1=0, a2=0, num_samples=100)
         assert np.all(samples == samples[0])
 
+    def test_batched_sample_shapes(self, flow_model):
+        """Array inputs vectorize with documented shape conventions."""
+        q = np.array([2.0, 4.0, 6.0])
+        a1 = np.array([0.5, 0.6, 0.7])
+        a2 = np.array([0.4, 0.5, 0.6])
+        # array, num_samples=1 -> (N,)
+        v1 = flow_model.sample(q, a1, a2, num_samples=1)
+        assert v1.shape == (3,)
+        # array, num_samples>1 -> (N, num_samples)
+        vM = flow_model.sample(q, a1, a2, num_samples=50)
+        assert vM.shape == (3, 50)
+        # scalar input unchanged -> (num_samples,)
+        vs = flow_model.sample(2.0, 0.5, 0.4, num_samples=50)
+        assert vs.shape == (50,)
+        assert np.all(np.isfinite(vM)) and np.all(vM >= 0)
+
+    def test_batched_mixed_nonspinning(self, flow_model):
+        """Non-spinning entries in a batch use the deterministic fallback."""
+        q = np.array([3.0, 4.0])
+        v = flow_model.sample(q, np.array([0.0, 0.5]), np.array([0.0, 0.4]),
+                              num_samples=10)
+        assert np.all(v[0] == v[0, 0])          # non-spinning row is constant
+        assert not np.all(v[1] == v[1, 0])      # spinning row varies
+
+    def test_batched_matches_loop_distribution(self, flow_model):
+        """Batched and per-binary sampling agree distributionally (KS test)."""
+        rng = np.random.default_rng(0)
+        n = 1500
+        q = rng.uniform(1, 8, n)
+        a1 = rng.uniform(0.05, 1, n)
+        a2 = rng.uniform(0.05, 1, n)
+        batched = flow_model.sample(q, a1, a2, num_samples=1)
+        loop = np.array([flow_model.sample(q[i], a1[i], a2[i], num_samples=1)[0]
+                         for i in range(n)])
+        from scipy.stats import ks_2samp
+        assert ks_2samp(batched, loop).pvalue > 0.01
+
+    def test_log_prob_normalized(self, flow_model):
+        """exp(log_prob) integrates to ~1 over the kick magnitude."""
+        trapz = np.trapezoid if hasattr(np, "trapezoid") else np.trapz
+        vg = np.linspace(0, 3000, 4000)
+        lp = flow_model.log_prob(vg, np.full_like(vg, 4.0),
+                                 np.full_like(vg, 0.6), np.full_like(vg, 0.5))
+        assert abs(trapz(np.exp(lp), vg) - 1.0) < 0.02
+
+    def test_log_prob_scalar_and_shape(self, flow_model):
+        """log_prob returns a scalar for scalar input, array for arrays."""
+        assert np.ndim(flow_model.log_prob(500.0, 4.0, 0.6, 0.5)) == 0
+        out = flow_model.log_prob(np.array([300.0, 600.0]), 4.0, 0.6, 0.5)
+        assert out.shape == (2,) and np.all(np.isfinite(out))
+
 
 # =========================================================================
 # HLZ kick models
