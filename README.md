@@ -33,9 +33,16 @@ Throughout the package, we adopt the following conventions for binary black hole
 
 ## Getting the package
 
+This package requires Python 3 and [gwtools](https://pypi.org/project/gwtools/).
+
 ### From PyPI
 ```bash
-pip install gwModels
+pip install gwModels                # core (numpy, scipy, matplotlib, gwtools)
+pip install gwModels[surrogates]    # + gwsurrogate
+pip install gwModels[lal]           # + lalsuite
+pip install gwModels[seob]          # + pyseobnr
+pip install gwModels[kicks]         # + scikit-learn, torch, nflows (remnant kick models)
+pip install gwModels[all]           # all optional dependencies
 ```
 
 ### From source
@@ -105,24 +112,6 @@ Eccentric waveform models obtained by combining circular surrogates with an ecce
 | **bbh_final_spin_precessing_HBR2016** | Final spin | Precessing | [Hofmann, Barausse & Rezzolla (2016)](https://arxiv.org/abs/1605.01938) | [5_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_2_other_remnant_models.ipynb) |
 | **bbh_final_mass_non_precessing_UIB2016** | Final mass | Aligned-spin | [1611.00332](https://arxiv.org/abs/1611.00332) | [5_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_2_other_remnant_models.ipynb) |
 | **bbh_final_spin_non_precessing_UIB2016** | Final spin | Aligned-spin | [1611.00332](https://arxiv.org/abs/1611.00332) | [5_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_2_other_remnant_models.ipynb) |
-
-## Requirements
-This package requires Python 3 and gwtools.
-
-```bash
-pip install gwtools
-```
-
-Optional dependencies for specific models:
-- `scikit-learn` — for `gwModel_kick_q200_GPR`
-- `torch`, `nflows` — for `gwModel_kick_prec_flow`
-- `gwsurrogate` — for NRHybSur3dq8-gwNRHME and BHPTNRSur1dq1e4-gwNRHME tutorials
-
-Install optional groups with:
-```bash
-pip install gwModels[kicks]       # scikit-learn, torch, nflows for remnant kick models
-pip install gwModels[all]         # all optional dependencies
-```
 
 ## Issue tracker
 Known bugs are recorded in the project bug tracker:
