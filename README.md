@@ -101,8 +101,8 @@ Eccentric waveform models obtained by combining circular surrogates with an ecce
 
 | Model | Quantity | Spin Type | Reference | Tutorial |
 |-------|----------|-----------|-----------|----------|
-| **bbh_final_mass_precessing_BMR2012** | Final mass | Precessing | Barausse, Morozova & Rezzolla (2012) | [5_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_2_other_remnant_models.ipynb) |
-| **bbh_final_spin_precessing_HBR2016** | Final spin | Precessing | Hofmann, Barausse & Rezzolla (2016) | [5_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_2_other_remnant_models.ipynb) |
+| **bbh_final_mass_precessing_BMR2012** | Final mass | Precessing | [Barausse, Morozova & Rezzolla (2012)](https://arxiv.org/abs/1206.3803) | [5_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_2_other_remnant_models.ipynb) |
+| **bbh_final_spin_precessing_HBR2016** | Final spin | Precessing | [Hofmann, Barausse & Rezzolla (2016)](https://arxiv.org/abs/1605.01938) | [5_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_2_other_remnant_models.ipynb) |
 | **bbh_final_mass_non_precessing_UIB2016** | Final mass | Aligned-spin | [1611.00332](https://arxiv.org/abs/1611.00332) | [5_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_2_other_remnant_models.ipynb) |
 | **bbh_final_spin_non_precessing_UIB2016** | Final spin | Aligned-spin | [1611.00332](https://arxiv.org/abs/1611.00332) | [5_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/5_2_other_remnant_models.ipynb) |
 
