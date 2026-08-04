@@ -12,7 +12,8 @@
 __author__ = "Tousif Islam"
 
 import numpy as np
-from .remnant_utils import symmetric_mass_ratio, kerr_isco_radius, validate_q, validate_spin_magnitudes
+from .remnant_utils import symmetric_mass_ratio, validate_q, validate_spin_magnitudes
+from .Kerr import kerr_isco_radius
 
 def energy_at_isco(a):
     """

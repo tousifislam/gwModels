@@ -59,23 +59,3 @@ def symmetric_mass_ratio(q):
     """
     q = np.asarray(q, dtype=float)
     return q / (1.0 + q) ** 2
-
-
-def kerr_isco_radius(a):
-    """
-    Calculate Boyer-Lindquist r_ISCO(a) for equatorial orbits of a Kerr BH.
-
-    Parameters:
-        a: Dimensionless spin parameter (|a| <= 1).
-           Positive for prograde, negative for retrograde orbits.
-
-    Returns:
-        float or array: ISCO radius in units of GM/c^2.
-    """
-    a = np.asarray(a, dtype=float)
-    Z1 = 1.0 + (1 - a ** 2) ** (1 / 3.0) * ((1 + a) ** (1 / 3.0) + (1 - a) ** (1 / 3.0))
-    Z2 = np.sqrt(3 * a ** 2 + Z1 ** 2)
-    r_isco = 3 + Z2 - np.sign(a) * np.sqrt((3 - Z1) * (3 + Z1 + 2 * Z2))
-    return r_isco
-
-
