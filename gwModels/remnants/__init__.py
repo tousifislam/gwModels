@@ -21,3 +21,38 @@ from .Kerr import (clip_spin,
                    separatrix_ell,
                    separatrix_EL,
                    SPIN_CLIP)
+
+# gwModelRem family: unified remnant models for aligned-spin, precessing and
+# eccentric binaries, plus the point-particle limit.
+from .gwModelRemS import (gwModelRemS,
+                          gwModelRemS_mf,
+                          gwModelRemS_chif,
+                          gwModelRemS_Lpeak,
+                          gwModelRemS_omega_peak,
+                          gwModelRemS_kick)
+from .gwModelRemP import (gwModelRemP,
+                          gwModelRemP_mf,
+                          gwModelRemP_chif,
+                          gwModelRemP_Lpeak,
+                          spin_projections)
+from .gwModelRemSE import (gwModelRemSE,
+                           gwModelRemSE_mf,
+                           gwModelRemSE_chif,
+                           gwModelRemSE_kick,
+                           gwModelRemSE_Lpeak)
+from .gwModelEMRI import gwModelEMRI
+
+
+def __getattr__(name):
+    """
+    Lazily expose gwModelRemP_flow so torch and nflows stay optional.
+
+    Importing it eagerly would make `import gwModels` fail for users who have
+    not installed the "kicks" extra.
+    """
+    if name == "gwModelRemP_flow":
+        import importlib
+        module = importlib.import_module(".gwModelRemP_flow", __name__)
+        globals()["gwModelRemP_flow"] = module.gwModelRemP_flow
+        return module.gwModelRemP_flow
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
