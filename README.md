@@ -4,6 +4,7 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2502.02739-b31b1b.svg)](https://arxiv.org/abs/2502.02739)
 [![arXiv](https://img.shields.io/badge/arXiv-2604.17868-b31b1b.svg)](https://arxiv.org/abs/2604.17868)
 [![arXiv](https://img.shields.io/badge/arXiv-2511.11536-b31b1b.svg)](https://arxiv.org/abs/2511.11536)
+[![arXiv](https://img.shields.io/badge/arXiv-2608.00934-b31b1b.svg)](https://arxiv.org/abs/2608.00934)
 ![gwModels](https://raw.githubusercontent.com/tousifislam/gwModels/main/gwModels.png)
 ![Visitors](https://komarev.com/ghpvc/?username=tousifislam-gwModels&label=visits&color=brightgreen&base=1547)
 [![PyPI](https://img.shields.io/pypi/v/gwModels)](https://pypi.org/project/gwModels/)
@@ -97,16 +98,18 @@ Eccentric waveform models obtained by combining circular surrogates with an ecce
 #### gwModelRem family (unified remnant models)
 
 A single framework covering aligned-spin, precessing and eccentric binaries,
-plus the point-particle limit. All fitted coefficients are inline in the source.
+plus the point-particle limit, from Islam, Wadekar & Khanna (2026)
+([2608.00934](https://arxiv.org/abs/2608.00934)). All fitted coefficients are inline in
+the source.
 
-| Model | Regime | Inputs | Outputs | Valid Range | Extra Deps | Tutorial |
-|-------|--------|--------|---------|-------------|------------|----------|
-| **gwModelRemS** | Aligned-spin, quasi-circular | $q, \chi_{1z}, \chi_{2z}$ | $M_f, \chi_f, L_{\rm peak}, M\omega_{\rm peak}, v_{\rm kick}$ | $1 \leq q \leq 1000$ | — | [6_1](https://github.com/tousifislam/gwModels/blob/main/tutorials/6_1_gwModelRemS.ipynb) |
-| **gwModelRemP** | Precessing, quasi-circular | $q, a_i, \theta_i, \phi_i$ at $r=8M$ | $M_f, \|\chi_f\|, \theta_f, L_{\rm peak}$ | $q \leq 1000$, $S_\perp \leq 0.93$ | — | [6_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/6_2_gwModelRemP.ipynb) |
-| **gwModelRemSE** | Eccentric, non-precessing | $q, \chi_{iz}, e_{\rm ref}, \ell_{\rm ref}$ at $t=-2500M$ | $M_f, \chi_f, v_{\rm kick}, L_{\rm peak}$ | $q \leq 4$, $e_0 \leq 0.25$, non-spinning | — | [6_3](https://github.com/tousifislam/gwModels/blob/main/tutorials/6_3_gwModelRemSE.ipynb) |
-| **gwModelRemPE** | Eccentric, precessing | $q, a_i, \theta_i, \phi_i$ at $r=8M$; $e_{\rm ref}, \ell_{\rm ref}$ at $t=-2500M$ | $M_f, |\chi_f|, \theta_f, L_{\rm peak}$ | $q \leq 4$, $e_0 \leq 0.25$ | -- | [6_4](https://github.com/tousifislam/gwModels/blob/main/tutorials/6_4_gwModelRemPE.ipynb) |
-| **gwModelRemP_flow** | Precessing recoil distribution | $q, a_i, \theta_i, \phi_i$ at $r=8M$ | $P(v_{\rm kick})$ | $q \leq 1000$ | `torch`, `nflows` | [6_5](https://github.com/tousifislam/gwModels/blob/main/tutorials/6_5_gwModelRemP_flow.ipynb) |
-| **gwModelEMRI** | Point-particle limit | $q, \chi, \theta_{\rm inc}, e_{\rm sep}$ | $M_f, \chi_f$ | $q \gg 1000$ | — | -- |
+| Model | Regime | Inputs | Outputs | Valid Range | Extra Deps | Reference | Tutorial |
+|-------|--------|--------|---------|-------------|------------|-----------|----------|
+| **gwModelRemS** | Aligned-spin, quasi-circular | $q, \chi_{1z}, \chi_{2z}$ | $M_f, \chi_f, L_{\rm peak}, M\omega_{\rm peak}, v_{\rm kick}$ | $1 \leq q \leq 1000$ | — | [2608.00934](https://arxiv.org/abs/2608.00934) | [6_1](https://github.com/tousifislam/gwModels/blob/main/tutorials/6_1_gwModelRemS.ipynb) |
+| **gwModelRemP** | Precessing, quasi-circular | $q, a_i, \theta_i, \phi_i$ at $r=8M$ | $M_f, \|\chi_f\|, \theta_f, L_{\rm peak}$ | $q \leq 1000$, $S_\perp \leq 0.93$ | — | [2608.00934](https://arxiv.org/abs/2608.00934) | [6_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/6_2_gwModelRemP.ipynb) |
+| **gwModelRemSE** | Eccentric, non-precessing | $q, \chi_{iz}, e_{\rm ref}, \ell_{\rm ref}$ at $t=-2500M$ | $M_f, \chi_f, v_{\rm kick}, L_{\rm peak}$ | $q \leq 4$, $e_0 \leq 0.25$, non-spinning | — | [2608.00934](https://arxiv.org/abs/2608.00934) | [6_3](https://github.com/tousifislam/gwModels/blob/main/tutorials/6_3_gwModelRemSE.ipynb) |
+| **gwModelRemPE** | Eccentric, precessing | $q, a_i, \theta_i, \phi_i$ at $r=8M$; $e_{\rm ref}, \ell_{\rm ref}$ at $t=-2500M$ | $M_f, \|\chi_f\|, \theta_f, L_{\rm peak}$ | $q \leq 4$, $e_0 \leq 0.25$ | — | [2608.00934](https://arxiv.org/abs/2608.00934) | [6_4](https://github.com/tousifislam/gwModels/blob/main/tutorials/6_4_gwModelRemPE.ipynb) |
+| **gwModelRemP_flow** | Precessing recoil distribution | $q, a_i, \theta_i, \phi_i$ at $r=8M$ | $P(v_{\rm kick})$ | $q \leq 1000$ | `torch`, `nflows` | [2608.00934](https://arxiv.org/abs/2608.00934) | [6_5](https://github.com/tousifislam/gwModels/blob/main/tutorials/6_5_gwModelRemP_flow.ipynb) |
+| **gwModelEMRI** | Point-particle limit | $q, \chi, \theta_{\rm inc}, e_{\rm sep}$ | $M_f, \chi_f$ | $q \gg 1000$ | — | [2608.00934](https://arxiv.org/abs/2608.00934) | -- |
 
 ```python
 import numpy as np

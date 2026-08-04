@@ -12,6 +12,9 @@
 #    fit. The remnant models in this package use them as point-particle
 #    anchors, and they are also useful on their own for BHPT and EMRI work.
 #
+#    Used by the gwModelRem family of
+#    Islam, Wadekar & Khanna (2026), https://arxiv.org/abs/2608.00934
+#
 #    AUTHOR: Tousif Islam
 #    CREATED: 08-03-2026
 #    LAST MODIFIED: 08-03-2026

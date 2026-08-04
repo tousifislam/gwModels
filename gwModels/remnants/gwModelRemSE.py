@@ -12,6 +12,8 @@
 #    This model is provisional. See the "Known limitation" note below before
 #    relying on it, and do not extrapolate past e_ref ~ 0.3.
 #
+#    From Islam, Wadekar & Khanna (2026), https://arxiv.org/abs/2608.00934
+#
 #    AUTHOR: Tousif Islam
 #    CREATED: 08-02-2026
 #    LAST MODIFIED: 08-02-2026

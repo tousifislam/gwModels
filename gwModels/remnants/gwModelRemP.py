@@ -11,6 +11,8 @@
 #    Calibrated on 4458 NR + BHPT simulations for mass and spin, and 4062
 #    precessing simulations for the peak luminosity.
 #
+#    From Islam, Wadekar & Khanna (2026), https://arxiv.org/abs/2608.00934
+#
 #    AUTHOR: Tousif Islam
 #    CREATED: 08-02-2026
 #    LAST MODIFIED: 08-02-2026

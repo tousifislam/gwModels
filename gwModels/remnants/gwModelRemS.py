@@ -11,6 +11,8 @@
 #    Calibrated to NR (SXS, RIT, Maya) and BHPT simulations spanning
 #    1 <= q <= 1000 and |chi_iz| <= 1.
 #
+#    From Islam, Wadekar & Khanna (2026), https://arxiv.org/abs/2608.00934
+#
 #    AUTHOR: Tousif Islam
 #    CREATED: 08-02-2026
 #    LAST MODIFIED: 08-02-2026

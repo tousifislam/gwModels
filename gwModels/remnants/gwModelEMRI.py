@@ -15,6 +15,8 @@
 #    Also serves as a reference implementation of the point-particle backbone
 #    used by the calibrated models.
 #
+#    From Islam, Wadekar & Khanna (2026), https://arxiv.org/abs/2608.00934
+#
 #    AUTHOR: Tousif Islam
 #    CREATED: 08-02-2026
 #    LAST MODIFIED: 08-02-2026
