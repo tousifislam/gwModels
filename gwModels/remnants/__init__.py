@@ -40,6 +40,10 @@ from .gwModelRemSE import (gwModelRemSE,
                            gwModelRemSE_chif,
                            gwModelRemSE_kick,
                            gwModelRemSE_Lpeak)
+from .gwModelRemPE import (gwModelRemPE,
+                            gwModelRemPE_mf,
+                            gwModelRemPE_chif,
+                            gwModelRemPE_Lpeak)
 from .gwModelEMRI import gwModelEMRI
 
 

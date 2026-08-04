@@ -592,6 +592,68 @@ class TestGwModelRemPFlow:
 
 
 # =========================================================================
+# gwModelRemPE: eccentric precessing remnant model
+# =========================================================================
+class TestGwModelRemPE:
+    """Tests for gwModelRemPE, the eccentric extension of gwModelRemP."""
+
+    ARGS = (2.0, 0.7, 0.3, np.pi / 3, np.pi / 4, 0.0, 0.0)
+
+    def test_circular_limit_is_gwModelRemP(self):
+        """e_ref = 0 reduces to gwModelRemP bit-for-bit."""
+        pe = gwModels.remnants.gwModelRemPE(*self.ARGS, 0.0, 0.0)
+        p = gwModels.remnants.gwModelRemP(*self.ARGS)
+        for a, b in zip(pe, p):
+            np.testing.assert_allclose(a, b, rtol=0, atol=0)
+
+    def test_aligned_limit_is_gwModelRemSE(self):
+        """S_perp = Delta_perp = 0 reduces to gwModelRemSE."""
+        pe = gwModels.remnants.gwModelRemPE(
+            3.0, 0.5, 0.3, 0.0, np.pi, 0.0, 0.0, 0.15, 1.0)
+        se = gwModels.remnants.gwModelRemSE(3.0, 0.5, -0.3, 0.15, 1.0)
+        np.testing.assert_allclose(pe[0], se[0], rtol=0, atol=0)
+        np.testing.assert_allclose(pe[1], abs(se[1]), rtol=0, atol=0)
+        np.testing.assert_allclose(pe[3], se[3], rtol=0, atol=0)
+
+    def test_double_limit_is_gwModelRemS(self):
+        """Aligned and circular together reduce to gwModelRemS."""
+        pe = gwModels.remnants.gwModelRemPE(
+            3.0, 0.5, 0.3, 0.0, np.pi, 0.0, 0.0, 0.0, 0.0)
+        s = gwModels.remnants.gwModelRemS(3.0, 0.5, -0.3)
+        np.testing.assert_allclose(pe[0], s[0], rtol=0, atol=0)
+        np.testing.assert_allclose(pe[1], abs(s[1]), rtol=0, atol=0)
+        np.testing.assert_allclose(pe[3], s[2], rtol=0, atol=0)
+
+    def test_theta_f_uncorrected(self):
+        """theta_f carries no eccentric correction, by construction."""
+        for e in [0.0, 0.1, 0.25]:
+            pe = gwModels.remnants.gwModelRemPE(*self.ARGS, e, 0.7)
+            p = gwModels.remnants.gwModelRemP(*self.ARGS)
+            np.testing.assert_allclose(pe[2], p[2], rtol=0, atol=0)
+
+    def test_physical_bounds(self):
+        rng = np.random.default_rng(0)
+        n = 20000
+        q = np.exp(rng.uniform(0, np.log(1000), n))
+        a1 = rng.uniform(0, 1, n)
+        a2 = rng.uniform(0, 1, n)
+        t1 = rng.uniform(0, np.pi, n)
+        t2 = rng.uniform(0, np.pi, n)
+        e = rng.uniform(0, 0.25, n)
+        l = rng.uniform(0, 2 * np.pi, n)
+        Mf, af, thf, Lp = gwModels.remnants.gwModelRemPE(
+            q, a1, a2, t1, t2, 0.0, 0.0, e, l)
+        assert np.all((Mf > 0) & (Mf <= 1))
+        assert np.all((af >= 0) & (af <= 1))
+        assert np.all((thf >= 0) & (thf <= np.pi))
+        assert np.all(Lp > 0)
+
+    def test_rejects_bad_eccentricity(self):
+        with pytest.raises(ValueError):
+            gwModels.remnants.gwModelRemPE(*self.ARGS, 1.0, 0.0)
+
+
+# =========================================================================
 # Package-level smoke tests
 # =========================================================================
 class TestPublicAPISmoke:
