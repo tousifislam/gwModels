@@ -13,3 +13,8 @@ Notebook Tutorials
    4_3_dynamics_gwEccEvolve_NoSpinq4
    5_1_gwModels_kicks
    5_2_other_remnant_models
+   6_1_gwModelRemS
+   6_2_gwModelRemP
+   6_3_gwModelRemSE
+   6_4_gwModelRemPE
+   6_5_gwModelRemP_flow

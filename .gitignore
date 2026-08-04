@@ -9,3 +9,5 @@ docs/build/
 *.egg-info/
 dist/
 .DS_Store
+# notebooks are copied in from tutorials/ at docs build time
+docs/source/notebooks/*.ipynb

@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath(os.path.join("..", "..")))
 project = "gwModels"
 copyright = "2024, Tousif Islam"
 author = "Tousif Islam"
-release = "0.1.4"
+release = "0.2.0"
 
 # -- General configuration ---------------------------------------------------
 

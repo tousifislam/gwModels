@@ -18,6 +18,7 @@ EXPECTED_FILES = {
     "gwModel_kick_prec_flow.pt": ("fee7e290eba19a2e11cb30750571e05a", 31034),
     "gwModel_kick_prec_flow_config.npy": ("b052c4f12e4bb29ffe5ee3680a791f1e", 592),
     "gwModel_kick_q200_GPR_aligned_spin.pkl": ("564fcc2c2e5eadd7656825b399dced83", 1779153),
+    "gwModelRemP_flow.pt": ("82ec1cccb4b5c2e621cc47d0aca95dd4", 1321630),
 }
 
 

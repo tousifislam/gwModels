@@ -4,13 +4,14 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2502.02739-b31b1b.svg)](https://arxiv.org/abs/2502.02739)
 [![arXiv](https://img.shields.io/badge/arXiv-2604.17868-b31b1b.svg)](https://arxiv.org/abs/2604.17868)
 [![arXiv](https://img.shields.io/badge/arXiv-2511.11536-b31b1b.svg)](https://arxiv.org/abs/2511.11536)
+[![arXiv](https://img.shields.io/badge/arXiv-2608.00934-b31b1b.svg)](https://arxiv.org/abs/2608.00934)
 ![gwModels](https://raw.githubusercontent.com/tousifislam/gwModels/main/gwModels.png)
 ![Visitors](https://komarev.com/ghpvc/?username=tousifislam-gwModels&label=visits&color=brightgreen&base=1547)
 [![PyPI](https://img.shields.io/pypi/v/gwModels)](https://pypi.org/project/gwModels/)
 [![Documentation](https://img.shields.io/badge/docs-online-brightgreen)](https://tousifislam.com/gwModels/)
 [![License](https://img.shields.io/github/license/tousifislam/gwModels)](https://github.com/tousifislam/gwModels/blob/main/LICENSE)
 ![Created](https://img.shields.io/badge/created-March%202024-blue)
-![Last Updated](https://img.shields.io/badge/last%20updated-May%202026-blue)
+![Last Updated](https://img.shields.io/badge/last%20updated-August%202026-blue)
 
 ## **gwModels**
 This package is intended to host a variety of data-driven and phenomenological models for the gravitational radiation (waveforms) emitted from binary black hole mergers. For questions, suggestions or collaborations, please feel free to drop an email to tousifislam24@gmail.com. Detailed documentation is available at https://tousifislam.com/gwModels/
@@ -93,6 +94,59 @@ Eccentric waveform models obtained by combining circular surrogates with an ecce
 | **gwEccEvolve_NoSpinq4** | SVD surrogate + GPR | $1 \leq q \leq 4$, $0.003 \leq e_0 \leq 0.443$ | [2604.17868](https://arxiv.org/abs/2604.17868) | [4_3](https://github.com/tousifislam/gwModels/blob/main/tutorials/4_3_dynamics_gwEccEvolve_NoSpinq4.ipynb) |
 
 ### 5. Remnant Properties: Final Mass, Spin, and Kick
+
+#### gwModelRem family (unified remnant models)
+
+A single framework covering aligned-spin, precessing and eccentric binaries,
+plus the point-particle limit, from Islam, Wadekar & Khanna (2026)
+([2608.00934](https://arxiv.org/abs/2608.00934)). All fitted coefficients are inline in
+the source.
+
+| Model | Regime | Inputs | Outputs | Valid Range | Extra Deps | Reference | Tutorial |
+|-------|--------|--------|---------|-------------|------------|-----------|----------|
+| **gwModelRemS** | Aligned-spin, quasi-circular | $q, \chi_{1z}, \chi_{2z}$ | $M_f, \chi_f, L_{\rm peak}, M\omega_{\rm peak}, v_{\rm kick}$ | $1 \leq q \leq 1000$ | — | [2608.00934](https://arxiv.org/abs/2608.00934) | [6_1](https://github.com/tousifislam/gwModels/blob/main/tutorials/6_1_gwModelRemS.ipynb) |
+| **gwModelRemP** | Precessing, quasi-circular | $q, a_i, \theta_i, \phi_i$ at $r=8M$ | $M_f, \|\chi_f\|, \theta_f, L_{\rm peak}$ | $q \leq 1000$, $S_\perp \leq 0.93$ | — | [2608.00934](https://arxiv.org/abs/2608.00934) | [6_2](https://github.com/tousifislam/gwModels/blob/main/tutorials/6_2_gwModelRemP.ipynb) |
+| **gwModelRemSE** | Eccentric, non-precessing | $q, \chi_{iz}, e_{\rm ref}, \ell_{\rm ref}$ at $t=-2500M$ | $M_f, \chi_f, v_{\rm kick}, L_{\rm peak}$ | $q \leq 4$, $e_0 \leq 0.25$, non-spinning | — | [2608.00934](https://arxiv.org/abs/2608.00934) | [6_3](https://github.com/tousifislam/gwModels/blob/main/tutorials/6_3_gwModelRemSE.ipynb) |
+| **gwModelRemPE** | Eccentric, precessing | $q, a_i, \theta_i, \phi_i$ at $r=8M$; $e_{\rm ref}, \ell_{\rm ref}$ at $t=-2500M$ | $M_f, \|\chi_f\|, \theta_f, L_{\rm peak}$ | $q \leq 4$, $e_0 \leq 0.25$ | — | [2608.00934](https://arxiv.org/abs/2608.00934) | [6_4](https://github.com/tousifislam/gwModels/blob/main/tutorials/6_4_gwModelRemPE.ipynb) |
+| **gwModelRemP_flow** | Precessing recoil distribution | $q, a_i, \theta_i, \phi_i$ at $r=8M$ | $P(v_{\rm kick})$ | $q \leq 1000$ | `torch`, `nflows` | [2608.00934](https://arxiv.org/abs/2608.00934) | [6_5](https://github.com/tousifislam/gwModels/blob/main/tutorials/6_5_gwModelRemP_flow.ipynb) |
+| **gwModelEMRI** | Point-particle limit | $q, \chi, \theta_{\rm inc}, e_{\rm sep}$ | $M_f, \chi_f$ | $q \gg 1000$ | — | [2608.00934](https://arxiv.org/abs/2608.00934) | -- |
+
+```python
+import numpy as np
+import gwModels
+
+Mf, chif, Lpeak, wpeak, vkick = gwModels.remnants.gwModelRemS(3.0, 0.5, -0.2)
+Mf, af, theta_f, Lpeak = gwModels.remnants.gwModelRemP(
+    2.0, 0.7, 0.3, np.pi/3, np.pi/4, 0.0, 0.0)
+
+flow = gwModels.remnants.gwModelRemP_flow()
+median, p5, p95 = flow.predict(2.0, 0.7, 0.3, np.pi/3, np.pi/4, 0.0, 0.0)
+```
+
+Per-quantity functions are also available: `gwModelRemS_mf`, `gwModelRemS_chif`,
+`gwModelRemS_Lpeak`, `gwModelRemS_omega_peak`, `gwModelRemS_kick`, and the
+corresponding `gwModelRemP_*` and `gwModelRemSE_*` entry points.
+
+Two caveats worth reading before use:
+
+- **gwModelRemPE applies the gwModelRemSE corrections to a precessing
+  baseline**, treating eccentricity and precession as independent at leading
+  order. This is the intended construction, but the factorization has not been
+  checked against precessing eccentric NR, of which very little exists, so
+  treat its eccentric corrections with the same caution as gwModelRemSE.
+- **gwModelRemSE is provisional.** The circular limit is exact, but at
+  $e_{\rm ref} > 0$ the correction does not yet improve on the quasi-circular
+  baseline on NR data (neutral to a few percent worse inside its calibration
+  domain). Do not extrapolate past $e_{\rm ref} \sim 0.3$, where the anomaly
+  modulation becomes an order of magnitude larger than the residual it corrects.
+- **gwModelEMRI's separatrix solver does not always converge**, failing for
+  about 6% of a grid over $(\chi, \theta_{\rm inc}, e)$, worst near polar
+  inclination at high spin. It warns by default; pass `return_converged=True`
+  for the mask. Equatorial orbits always converge.
+
+The `gwModelRemS` recoil is a refit of `gwModel_kick_q200` on an expanded
+dataset, and `gwModelRemP_flow` supersedes `gwModel_kick_prec_flow`. Both
+earlier models remain available and unchanged.
 
 #### Kick velocity models
 
