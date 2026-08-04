@@ -164,7 +164,7 @@ class gwModelRemP_flow:
             theta1, theta2: Spin tilt angles at r = 8M in radians, in [0, pi].
 
         Returns:
-            array: Shape (N, 5), columns (Mf, |chi_f|, eta, S_perp, Delta_perp).
+            array: Shape (N, 5), columns Mf, abs(chi_f), eta, S_perp, Delta_perp.
         """
         q = np.atleast_1d(np.asarray(q, dtype=float))
         a1 = np.atleast_1d(np.asarray(a1, dtype=float))

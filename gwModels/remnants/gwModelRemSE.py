@@ -177,7 +177,8 @@ def gwModelRemSE_mf(q, chi1z, chi2z, e_ref, l_ref):
     """
     Final mass Mf/M of an eccentric non-precessing BBH merger.
 
-    Ansatz:
+    Ansatz::
+
         Mf|_ecc = Mf^circ [1 + P_M (1 + alpha_M e sin(l + phi_M))]
 
     Parameters:
@@ -201,7 +202,8 @@ def gwModelRemSE_chif(q, chi1z, chi2z, e_ref, l_ref):
     """
     Final spin chi_f,z of an eccentric non-precessing BBH merger.
 
-    Ansatz:
+    Ansatz::
+
         chif|_ecc = chif^circ [1 + P_chi (1 + alpha_chi e cos(l + phi_chi))]
 
     Parameters:
@@ -225,7 +227,8 @@ def gwModelRemSE_kick(q, chi1z, chi2z, e_ref, l_ref):
     """
     Recoil velocity of an eccentric non-precessing BBH merger.
 
-    Ansatz:
+    Ansatz::
+
         vk|_ecc = vk^circ [1 + P_k (1 + alpha_k e cos(l + phi_k))]
 
     The correction is multiplicative, so it vanishes at q = 1 for non-spinning
@@ -252,7 +255,8 @@ def gwModelRemSE_Lpeak(q, chi1z, chi2z, e_ref, l_ref):
     """
     Peak GW luminosity of an eccentric non-precessing BBH merger.
 
-    Ansatz:
+    Ansatz::
+
         Lp|_ecc = Lp^circ [1 + P_L (1 - alpha_L e sin(l + phi_L))]
 
     Parameters:

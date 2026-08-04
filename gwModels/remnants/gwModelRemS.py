@@ -125,7 +125,8 @@ def gwModelRemS_mf(q, chi1z, chi2z):
     """
     Final mass Mf/M of a non-precessing quasi-circular BBH merger.
 
-    Ansatz:
+    Ansatz::
+
         Mf/M = 1 - eta * E_rad_hat
         E_rad_hat = (1-4 eta) [1 - E_ISCO(chi_hat)]
                     + 4 eta E_EM(chi_hat, chi_a)
@@ -184,7 +185,8 @@ def gwModelRemS_chif(q, chi1z, chi2z):
     """
     Final spin chi_f,z of a non-precessing quasi-circular BBH merger.
 
-    Ansatz:
+    Ansatz::
+
         chi_f,z = S_tilde + eta * ell_orb
         S_tilde = (q^2 chi1z + chi2z)/(1+q)^2 = (1 - 2 eta) chi_hat
         ell_orb = (1-4 eta) ell_Kerr(chi_hat)
@@ -254,7 +256,8 @@ def gwModelRemS_Lpeak(q, chi1z, chi2z):
     """
     Peak GW luminosity of a non-precessing quasi-circular BBH merger.
 
-    Ansatz:
+    Ansatz::
+
         L_peak = eta^2 * L_hat
         L_hat  = L_EM(chi_hat, chi_a) + (1-4 eta) P_L(eta, chi_hat)
                  + delta_m chi_a (nu0 + nu1 chi_hat + nu2 eta)
@@ -310,9 +313,10 @@ _OMEGA_PEAK_PARAMS = {
 
 def gwModelRemS_omega_peak(q, chi1z, chi2z):
     """
-    Peak GW frequency M*omega at the peak of |h22|.
+    Peak GW frequency M*omega at the peak of abs(h22).
 
-    Ansatz:
+    Ansatz::
+
         omega_peak = f_EM + (1-4 eta) P + delta_m chi_a U
 
     Parameters:
@@ -321,7 +325,7 @@ def gwModelRemS_omega_peak(q, chi1z, chi2z):
         chi2z: Aligned spin of the lighter BH, in [-1, 1].
 
     Returns:
-        float or array: M*omega at peak |h22| (dimensionless).
+        float or array: M*omega at peak abs(h22) (dimensionless).
     """
     q, chi1z, chi2z = _validate_inputs(q, chi1z, chi2z)
     eta, dm, ch, ca = _derived_vars(q, chi1z, chi2z)
@@ -401,7 +405,8 @@ def gwModelRemS_kick(q, chi1z, chi2z):
     """
     Recoil velocity of a non-precessing quasi-circular BBH merger.
 
-    Ansatz:
+    Ansatz::
+
         v_kick   = sqrt(V_mass^2 + V_spin^2 + 2 V_mass V_spin cos(xi))
         V_mass   = A eta^2 delta_m (1 + B eta + C eta^2)
         V_spin   = H eta^2 R_v
@@ -468,7 +473,7 @@ def gwModelRemS(q, chi1z, chi2z):
             Mf: final mass in units of the total mass
             chif: final dimensionless spin along z (signed)
             Lpeak: peak GW luminosity in geometric units (c^5/G)
-            omega_peak: M*omega at peak |h22| (dimensionless)
+            omega_peak: M*omega at peak abs(h22) (dimensionless)
             vkick: recoil velocity in km/s
 
     Example:

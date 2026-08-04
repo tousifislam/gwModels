@@ -44,8 +44,8 @@ def clip_spin(chi, limit=SPIN_CLIP):
     """
     Clip a dimensionless spin away from the extremal values +/-1.
 
-    At |chi| = 1 the Kerr ISCO degenerates: r_ISCO -> 1 for prograde orbits,
-    and the angular-momentum denominator sqrt(r^1.5 - 3 sqrt(r) + 2 chi)
+    At spin magnitude 1 the Kerr ISCO degenerates: r_ISCO -> 1 for prograde
+    orbits, and the denominator sqrt(r^1.5 - 3 sqrt(r) + 2 chi)
     vanishes, so kerr_isco_angular_momentum divides by zero. Effective spin
     combinations such as chi_hat reach exactly +/-1 when both component spins
     are extremal, so calibrated fits clip before evaluating the ISCO.
@@ -78,7 +78,7 @@ def kerr_isco_radius(a):
     Limits: r_ISCO(0) = 6, r_ISCO(1) = 1, r_ISCO(-1) = 9.
 
     Parameters:
-        a: Dimensionless spin parameter (|a| <= 1). Positive for prograde,
+        a: Dimensionless spin parameter, abs(a) <= 1. Positive for prograde,
            negative for retrograde orbits.
 
     Returns:
@@ -100,7 +100,7 @@ def kerr_isco_energy(a):
     Limits: E_ISCO(0) = sqrt(8/9) = 0.942809, E_ISCO(1) = 1/sqrt(3) = 0.577350.
 
     Parameters:
-        a: Dimensionless spin parameter (|a| <= 1).
+        a: Dimensionless spin parameter, abs(a) <= 1.
 
     Returns:
         float or array: Specific energy at the ISCO.
@@ -118,7 +118,7 @@ def kerr_isco_angular_momentum(a):
     with r = r_ISCO(a) and d = sign(a). Limits: L_ISCO(0) = 2 sqrt(3) = 3.464102,
     L_ISCO(1) = 2/sqrt(3) = 1.154701, L_ISCO(-1) = 22/(3 sqrt(3)) = 4.232809.
 
-    Note that the denominator vanishes at |a| = 1, where this expression is a
+    Note that the denominator vanishes at extremal spin, where this is a
     removable singularity: evaluating at exactly +/-1 divides by zero. Pass the
     spin through clip_spin first if extremal values are possible. An equivalent
     form regular at the endpoints is (2/(3 sqrt(3)))(1 + 2 sqrt(3 r - 2)); the
@@ -126,7 +126,7 @@ def kerr_isco_angular_momentum(a):
     remnant fits were built on it.
 
     Parameters:
-        a: Dimensionless spin parameter (|a| <= 1).
+        a: Dimensionless spin parameter, abs(a) <= 1.
 
     Returns:
         float or array: Specific angular momentum magnitude at the ISCO.
@@ -150,7 +150,7 @@ def kerr_ell(a):
     point-particle limit, following Hofmann, Barausse & Rezzolla (2016).
 
     Parameters:
-        a: Dimensionless spin parameter (|a| <= 1).
+        a: Dimensionless spin parameter, abs(a) <= 1.
 
     Returns:
         float or array: Effective angular momentum at the ISCO.
