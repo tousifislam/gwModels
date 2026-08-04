@@ -23,13 +23,13 @@ class PeakFinderCrude:
     """
     def __init__(self, time, signal, dmin=1, dmax=1):
         """
-        Input :
-        time: 1d-array, time
-        signal: 1d-array, data signal from which to extract high and low envelopes
-        dmin, dmax: int, optional, size of chunks, use this if the size of the input signal is too big
-        
-        Output :
-        lmin,lmax : high/low envelope idx of input signal s
+        Input:
+            time: 1d-array, time
+            signal: 1d-array, signal to extract high and low envelopes from
+            dmin, dmax: int, optional, chunk size for very large input signals
+
+        Output:
+            lmin, lmax: high/low envelope idx of input signal s
         """
         self.time = time
         self.signal = signal
@@ -76,14 +76,13 @@ class PeakFinderScipy:
     """
     def __init__(self, time, signal, distance_btw_peaks=100):
         """
-        Input :
-        time: 1d-array, time
-        signal: 1d-array, data signal from which to extract high and low envelopes
-        distance_btw_peaks : rough distance between peaks in time series g(t)
-                             default: 100
-        
-        Output :
-        lmin,lmax : high/low envelope idx of input signal s
+        Input:
+            time: 1d-array, time
+            signal: 1d-array, signal to extract high and low envelopes from
+            distance_btw_peaks: rough peak separation in g(t), default 100
+
+        Output:
+            lmin, lmax: high/low envelope idx of input signal s
         """
         self.time = time
         self.signal = signal

@@ -139,7 +139,7 @@ class gwModel_kick_prec_flow:
         """
         Conditional log-density log p(v_kick | q, a1, a2) of the kick magnitude.
 
-        Evaluates the flow's density of the recoil *magnitude* v = |x| by
+        Evaluates the flow's density of the recoil magnitude v = abs(x) by
         folding the two signed branches of the underlying variable and
         including the normalization Jacobian, so that exp(log_prob) integrates
         to 1 over v >= 0. All inputs broadcast to a common shape and are scored

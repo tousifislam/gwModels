@@ -95,7 +95,7 @@ def bbh_final_spin_precessing_HBR2016(q, a1, a2, theta1, theta2, delta_phi,
         verbose: Print intermediate calculations
 
     Returns:
-        chi_final: Final spin magnitude |a_final| <= 1
+        chi_final: Final spin magnitude, abs(a_final) <= 1
 
     Reference: Hofmann, Barausse & Rezzolla (2016), ApJL 825, L19, arXiv:1605.01938
     """

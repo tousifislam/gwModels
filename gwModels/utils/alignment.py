@@ -84,11 +84,11 @@ def phase_align_dict(hdict):
     of higher modes are consistent.
 
     Parameters:
-    hdict (dict): Dictionary of gravitational wave modes. Keys should include 
-                  'h_l2m2', 'h_l3m3', etc.
+        hdict (dict): Dictionary of gravitational wave modes. Keys should
+            include 'h_l2m2', 'h_l3m3', etc.
 
     Returns:
-    dict: A new dictionary with aligned phases for each mode.
+        dict: A new dictionary with aligned phases for each mode.
     """
     hdict_out = {}
     phi=np.unwrap(np.angle(hdict['h_l2m2']))
@@ -114,25 +114,25 @@ class AlignWFData:
     This class also casts the waveform onto a different time grid if specified.
 
     Attributes:
-    t_input (np.ndarray): Input time array.
-    h_input (dict): Input waveform dictionary with keys as spherical harmonics modes.
-    t_common (np.ndarray or None): Target time grid on which waveform data should be cast.
+        t_input (np.ndarray): Input time array.
+        h_input (dict): Input waveform dictionary with keys as spherical harmonics modes.
+        t_common (np.ndarray or None): Target time grid on which waveform data should be cast.
 
     Methods:
-    _find_peak_time(): Finds the time of the peak for the (2,2) mode.
-    _align_time(): Aligns the waveform to ensure the peak is at t=0.
-    _find_offset_orb_phase(): Finds the phase rotation to set the initial (2,2) mode phase to zero.
-    _align_phase(): Aligns the phases of the waveform modes.
-    _cast_waveform_on_timegrid(): Casts the waveform onto the specified time grid.
+        _find_peak_time(): Finds the time of the peak for the (2,2) mode.
+        _align_time(): Aligns the waveform to ensure the peak is at t=0.
+        _find_offset_orb_phase(): Finds the phase rotation to set the initial (2,2) mode phase to zero.
+        _align_phase(): Aligns the phases of the waveform modes.
+        _cast_waveform_on_timegrid(): Casts the waveform onto the specified time grid.
     """
     def __init__(self, t_input, h_input, t_common=None):
         """
-        t_input: float
-        h_input: dictionary whose keys are sphereical harmonics modes
-                 dictionary keys should be 'h_l2m2', 'h_l3m3' and so on
-                 dictionary must contain 'h_l2m2'
-        t_common: target time grid on which waveform data should be cast
-                 default: None
+        Parameters:
+            t_input: float
+            h_input: dictionary whose keys are spherical harmonics modes such
+                as 'h_l2m2' and 'h_l3m3'; must contain 'h_l2m2'
+            t_common: target time grid on which waveform data should be cast,
+                default None
         """
         self.t_input = t_input
         self.h_input = h_input
